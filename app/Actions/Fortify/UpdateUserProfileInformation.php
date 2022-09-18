@@ -5,6 +5,7 @@ namespace App\Actions\Fortify;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
@@ -28,9 +29,21 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         ])->validateWithBag('updateProfileInformation');
 
         if (isset($input['photo'])) {
+            $firebase_storage_path = 'Profile/';
+            $localfolder           = public_path('firebase-temp-uploads') .'/';
+            if (!file_exists($localfolder)) {
+                mkdir($localfolder, 0775, true);
+            }
+            $filename = rand(0000, 9999).time().'.'.$input['photo']->extension();
+            $file = $input['photo'];
+            if ($file->move($localfolder, $filename)) {
+                $uploadedfile = fopen($localfolder.$filename, 'r');
+                app('firebase.storage')->getBucket()->upload($uploadedfile, ['name' => $firebase_storage_path . $filename]);
+                // will remove from local laravel folder
+                unlink($localfolder . $filename);
+            }
             $user->updateProfilePhoto($input['photo']);
         }
-
         if ($input['email'] !== $user->email &&
             $user instanceof MustVerifyEmail) {
             $this->updateVerifiedUser($user, $input);

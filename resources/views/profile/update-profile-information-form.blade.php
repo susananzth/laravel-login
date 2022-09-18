@@ -30,7 +30,6 @@
                 <div class="mt-2" x-show="! photoPreview">
                     <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->username }}" class="rounded-full h-20 w-20 object-cover">
                 </div>
-                {{ $this->user->profile_photo_url }}
                 <!-- New Profile Photo Preview -->
                 <div class="mt-2" x-show="photoPreview" style="display: none;">
                     <span class="block rounded-full w-20 h-20 bg-cover bg-no-repeat bg-center"
@@ -51,6 +50,7 @@
                 <x-jet-input-error for="photo" class="mt-2" />
             </div>
         @endif
+        {{public_path('firebase-temp-uploads') .'/'}}
 
         <!-- Firstname -->
         <div class="col-span-6 sm:col-span-4">
