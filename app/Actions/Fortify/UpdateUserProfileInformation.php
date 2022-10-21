@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Kreait\Laravel\Firebase\Facades\Firebase;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
@@ -29,21 +30,44 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         ])->validateWithBag('updateProfileInformation');
 
         if (isset($input['photo'])) {
+            $user->updateProfilePhoto($input['photo']);
+        }
+        /*if (isset($input['photo'])) {
             $firebase_storage_path = 'Profile/';
-            $localfolder           = public_path('firebase-temp-uploads') .'/';
+            $localfolder           = public_path('profile-photos');
             if (!file_exists($localfolder)) {
                 mkdir($localfolder, 0775, true);
             }
-            $filename = rand(0000, 9999).time().'.'.$input['photo']->extension();
+            //$filename = rand(0000, 9999).time().'.'.$input['photo']->extension();
             $file = $input['photo'];
-            if ($file->move($localfolder, $filename)) {
-                $uploadedfile = fopen($localfolder.$filename, 'r');
+
+            // generate a new filename. getClientOriginalExtension() for the file extension
+            $filename = rand(0000, 9999).time() . '.' . $file->getClientOriginalExtension();
+            // save to storage/app/photos as the new $filename
+            Storage::disk('local')->put($localfolder. '/' . $filename, $file);
+
+
+            //$path = $file->storeAs('firebase-temp-uploads', $filename);
+
+            //$localfolder = Storage::url($filename);
+            if ($localfolder) {
+                $uploadedfile = fopen($localfolder. '/' . $filename, 'r');
                 app('firebase.storage')->getBucket()->upload($uploadedfile, ['name' => $firebase_storage_path . $filename]);
                 // will remove from local laravel folder
-                unlink($localfolder . $filename);
+                unlink($localfolder. '/' . $filename);
             }
             $user->updateProfilePhoto($input['photo']);
         }
+
+        if (isset($input['photo'])) {
+            $user->updateProfilePhoto($input['photo']);
+            $firebase_storage_path = 'Profile/';
+            $uploadedfile = fopen(config('app.url').'/user/'.config('jetstream.profile_photo_disk', 'public') . '/' . $user->profile_photo_path, 'r');
+                app('firebase.storage')->getBucket()->upload($uploadedfile, ['name' => $firebase_storage_path . $user->profile_photo_path]);
+                // will remove from local laravel folder
+                unlink(config('app.url').'/user/'.config('jetstream.profile_photo_disk', 'public'). '/' . $user->profile_photo_path);
+        }*/
+
         if ($input['email'] !== $user->email &&
             $user instanceof MustVerifyEmail) {
             $this->updateVerifiedUser($user, $input);
