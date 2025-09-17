@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     {
 
         \App\Models\User::factory()->create([
+            'name' => 'Test User',
             'firstname' => 'Susana',
             'lastname' => 'Piñero',
             'username' => 'susananzth',
@@ -27,6 +28,7 @@ class DatabaseSeeder extends Seeder
 
         ]);
         \App\Models\User::factory()->create([
+            'name' => 'Test User',
             'firstname' => 'Super',
             'lastname' => 'Admin',
             'username' => 'supersu',

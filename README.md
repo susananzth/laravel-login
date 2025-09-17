@@ -1,6 +1,6 @@
-# Laravel 9.* login with jetstream 🤓
+# Laravel Schedule 🤓
 
-Sistema de login con configuracion de perfil y auth 2.0
+Sistema de registro de citas, horarios en laravel 12
 
 ## Comenzando 💪🚀
 
@@ -12,7 +12,7 @@ _Que herramientas/programas necesitas para poner en marcha el proyecto y como in
 
 * GIT [Link](https://git-scm.com/downloads)
 * Entorno de servidor local, Ej: [Laragon](https://laragon.org/download/), [XAMPP](https://www.apachefriends.org/es/index.html) o [LAMPP](https://bitnami.com/stack/lamp/installer).
-* PHP Version > 8.0 [Link](https://www.php.net/downloads.php).
+* PHP Version > 8.4 [Link](https://www.php.net/downloads.php).
 * Manejador de dependencias de PHP [Composer](https://getcomposer.org/download/).
 * [Node JS](https://nodejs.org/en/download/).
 
