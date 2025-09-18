@@ -14,7 +14,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+        ]);
         \App\Models\User::factory()->create([
             'name' => 'Test User',
             'firstname' => 'Susana',
@@ -26,17 +28,6 @@ class DatabaseSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
 
-        ]);
-        \App\Models\User::factory()->create([
-            'name' => 'Test User',
-            'firstname' => 'Super',
-            'lastname' => 'Admin',
-            'username' => 'supersu',
-            'phone' => '123456789',
-            'email' => 'admin@susananzth.com',
-            'password' => bcrypt('123456'),
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
         \App\Models\User::factory(10)->create();
     }
