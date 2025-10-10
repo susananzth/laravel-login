@@ -1,3 +1,4 @@
+@import "@fortawesome/fontawesome-free/css/all.css";
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
 
@@ -10,6 +11,9 @@
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-moto-red: #DC2626;  /* Tu rojo principal */
+    --color-moto-black: #1A1A1A; /* Tu negro oscuro */
 
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;

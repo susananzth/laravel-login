@@ -16,7 +16,6 @@ _Que herramientas/programas necesitas para poner en marcha el proyecto y como in
 * Manejador de dependencias de PHP [Composer](https://getcomposer.org/download/).
 * [Node JS](https://nodejs.org/en/download/).
 
-
 ### Instalación 🔧
 
 Paso a paso de lo que debes ejecutar para tener el proyecto en su servidor local.
