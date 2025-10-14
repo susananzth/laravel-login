@@ -1,19 +1,13 @@
 <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
-    <!-- Logo -->
-    <div class="text-center mb-8">
-        <div class="flex justify-center items-center mb-4">
-            <i class="fas fa-motorcycle text-moto-red text-3xl mr-3"></i>
-            <span class="text-moto-black text-2xl font-bold tracking-wider">Mi Taller</span>
-        </div>
-        <h2 class="text-2xl font-bold text-moto-black">Iniciar Sesión</h2>
-        <p class="text-gray-600 mt-2">Ingresa a tu cuenta para gestionar tus citas</p>
-    </div>
 
-    <!-- Session Status -->
+    <x-auth-header
+        :title="__('Iniciar Sesión')"
+        :description="__('Ingresa a tu cuenta para gestionar tus citas')"
+    />
+
     <x-auth-session-status class="mb-4 text-center" :status="session('status')" />
 
     <form method="POST" wire:submit="login" class="space-y-6">
-        <!-- Email Address -->
         <x-forms.input
             wireModel="email"
             :label="__('Correo electrónico')"
@@ -24,7 +18,6 @@
             placeholder="tu@email.com"
         />
 
-        <!-- Password -->
         <x-forms.input
             wireModel="password"
             :label="__('Contraseña')"
@@ -32,6 +25,7 @@
             required
             autocomplete="current-password"
             :placeholder="__('Ingresa tu contraseña')"
+            viewable
         />
 
         <!-- Remember Me & Forgot Password -->

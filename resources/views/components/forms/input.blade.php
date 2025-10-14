@@ -14,7 +14,7 @@
     $inputId = $name ?: uniqid('input_');
     $hasError = $error || ($name && $errors->has($name));
 
-    $baseClasses = "w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-moto-red focus:border-transparent transition duration-200 bg-white text-moto-black placeholder-gray-400";
+    $baseClasses = "w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-moto-red focus:border-transparent transition duration-200 bg-white text-moto-black placeholder-gray-400 outline-[none]";
     $errorClasses = "border-red-500 focus:ring-red-500";
     $normalClasses = "border-gray-300 focus:ring-moto-red";
 

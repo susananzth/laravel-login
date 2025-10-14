@@ -1,62 +1,61 @@
-<div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Create an account')" :description="__('Enter your details below to create your account')" />
+<div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+    <x-auth-header :title="__('Crear una cuenta')" :description="__('Ingrese sus datos a continuación para crear su cuenta.')" />
 
     <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+    <x-auth-session-status class="mb-4 text-center" :status="session('status')" />
 
-    <form method="POST" wire:submit="register" class="flex flex-col gap-6">
-        <!-- Name -->
-        <flux:input
-            wire:model="name"
-            :label="__('Name')"
+    <form method="POST" wire:submit="register" class="space-y-6">
+        <x-forms.input
+            wireModel="name"
+            :label="__('Nombre')"
             type="text"
             required
             autofocus
             autocomplete="name"
-            :placeholder="__('Full name')"
+            :placeholder="__('Nombre completo')"
         />
 
-        <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email address')"
+        <x-forms.input
+            wireModel="email"
+            :label="__('Correo electrónico')"
             type="email"
             required
             autocomplete="email"
-            placeholder="email@example.com"
+            placeholder="tu@email.com"
         />
 
-        <!-- Password -->
-        <flux:input
-            wire:model="password"
-            :label="__('Password')"
+        <x-forms.input
+            wireModel="password"
+            :label="__('Contraseña')"
             type="password"
             required
             autocomplete="new-password"
-            :placeholder="__('Password')"
+            :placeholder="__('Ingresa tu contraseña')"
             viewable
         />
 
-        <!-- Confirm Password -->
-        <flux:input
-            wire:model="password_confirmation"
-            :label="__('Confirm password')"
+        <x-forms.input
+            wireModel="password_confirmation"
+            :label="__('Confirmar contraseña')"
             type="password"
             required
             autocomplete="new-password"
-            :placeholder="__('Confirm password')"
+            :placeholder="__('Confirme contraseña')"
             viewable
         />
-
-        <div class="flex items-center justify-end">
-            <flux:button type="submit" variant="primary" class="w-full">
-                {{ __('Create account') }}
-            </flux:button>
-        </div>
+        <x-button variant="primary" type="submit" class="w-full">
+            {{ __('Crear cuenta') }}
+        </x-button>
     </form>
 
-    <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
-        <span>{{ __('Already have an account?') }}</span>
-        <flux:link :href="route('login')" wire:navigate>{{ __('Log in') }}</flux:link>
+    <div class="mt-6 text-center">
+        <p class="text-gray-600">
+            {{ __('¿Ya tiene una cuenta?') }}
+            <a href="{{ route('login') }}"
+                class="text-moto-red hover:text-red-700 font-medium"
+                wire:navigate>
+                {{ __('Inicie sesión') }}
+            </a>
+        </p>
     </div>
 </div>
