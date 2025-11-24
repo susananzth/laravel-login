@@ -59,4 +59,14 @@ class User extends Authenticatable
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
+
+    // Citas como cliente
+    public function appointments() {
+        return $this->hasMany(Appointment::class);
+    }
+
+    // Citas asignadas como técnico
+    public function assignedAppointments() {
+        return $this->hasMany(Appointment::class, 'technician_id');
+    }
 }
