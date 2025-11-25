@@ -49,7 +49,7 @@ if [ "$APP_ENV" = "production" ] || [ "$APP_ENV" = "prod" ]; then
     # --force: Necesario en producción para saltar la confirmación "Are you sure?"
     # --isolated: Evita que dos contenedores migren al mismo tiempo si escalas horizontalmente
     log "Deseas ejecutar migraciones..."
-    php artisan migrate --force --isolated
+    php artisan migrate --force
 
     log "✅ Optimización y Migración completada."
 
