@@ -16,7 +16,7 @@
 
         @fluxScripts
 
-        <script src="//unpkg.com/alpinejs" defer></script>
+        @livewireScripts
 
         <style>
             [x-cloak] { display: none !important; }
