@@ -63,7 +63,8 @@ class DatabaseSeeder extends Seeder
 
         // 3. Usuarios Iniciales
         $admin = User::factory()->create([
-            'name' => 'Admin MotoRapido',
+            'firstname' => 'Admin MotoRapido',
+            'lastname' => 'MotoRapido',
             'email' => 'admin@motorapido.com',
             'password' => bcrypt('password'),
         ]);
