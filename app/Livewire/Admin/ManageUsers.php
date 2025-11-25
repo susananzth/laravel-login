@@ -49,7 +49,7 @@ class ManageUsers extends Component
     }
 
     public function save() {
-        $this->validate();
+        $this->validate($this->rules());
 
         $data = [
             'name' => $this->name,
@@ -70,6 +70,9 @@ class ManageUsers extends Component
 
         // Notificación opcional (si tienes un componente de notificaciones)
         // $this->dispatch('notify', $this->userId ? 'Usuario actualizado' : 'Usuario creado');
+
+        // Volvemos a disparar el evento de cerrar para Alpine
+        $this->dispatch('close-modal');
 
         $this->resetInputFields();
     }

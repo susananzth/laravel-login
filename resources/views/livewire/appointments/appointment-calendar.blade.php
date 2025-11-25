@@ -57,7 +57,7 @@
         {{-- Usamos x-modal y Livewire para controlar la visibilidad con 'showModal' --}}
         <x-modal name="admin-appointment-manager" :show="$showModal" maxWidth="lg">
 
-            <form wire:submit.prevent="updateAppointment">
+            <form wire:submit.prevent="updateAppointment" id="appointmentForm">
                 <div class="bg-gray-50 pb-6 border-b border-gray-100 flex justify-between items-center rounded-t-lg">
                     <h3 class="text-lg font-bold text-moto-black flex items-center">
                         <i class="fas fa-motorcycle text-moto-red mr-2"></i>
@@ -131,7 +131,7 @@
                         Cancelar
                     </x-button>
                     {{-- Botón de Guardar usando el estilo 'primary' del componente x-button --}}
-                    <x-button type="submit" variant="primary" class="ml-3">
+                    <x-button type="submit" variant="primary" class="ml-3" form="appointmentForm">
                         Guardar Cambios
                     </x-button>
                 </x-slot>

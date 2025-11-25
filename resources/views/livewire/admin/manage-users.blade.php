@@ -97,7 +97,7 @@
 
     {{-- MODAL DE CREACIÓN / EDICIÓN --}}
     <x-modal name="user-manager-modal" :show="$showModal" maxWidth="md">
-        <form wire:submit.prevent="save">
+        <form wire:submit.prevent="save" id="userForm">
 
             {{-- Cabecera del Modal (Consistente con el calendario) --}}
             <div class="bg-gray-50 pb-6 border-b border-gray-100 flex justify-between items-center rounded-t-lg">
@@ -169,7 +169,7 @@
                 <x-button type="button" variant="secondary" wire:click="$set('showModal', false)">
                     Cancelar
                 </x-button>
-                <x-button type="submit" variant="primary" class="ml-3">
+                <x-button type="submit" variant="primary" class="ml-3" form="userForm">
                     {{ $userId ? 'Actualizar' : 'Guardar Usuario' }}
                 </x-button>
             </x-slot>
