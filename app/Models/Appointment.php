@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
+    protected $fillable = [
+        'user_id',
+        'technician_id',
+        'service_id',
+        'scheduled_at',
+        'finished_at',
+        'status',
+        'notes',
+    ];
+
     protected $casts = [
         'scheduled_at' => 'datetime',
         'finished_at' => 'datetime',

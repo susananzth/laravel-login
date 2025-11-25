@@ -29,14 +29,27 @@ class CreateAppointment extends Component
     public function getAvailableSlotsProperty() {
         if(!$this->service_id || !$this->date) return [];
 
-        // Lógica simple: Horas fijas de 9am a 5pm
-        // (Aquí puedes agregar lógica compleja para excluir horas ocupadas)
+        // 1. Obtener las horas YA ocupadas para ese día
+        // Ignoramos las canceladas para liberar el hueco
+        $bookedTimes = Appointment::whereDate('scheduled_at', $this->date)
+            ->where('status', '!=', 'cancelled')
+            ->get()
+            ->map(function($appointment) {
+                return $appointment->scheduled_at->format('H:i');
+            })->toArray();
+
         $slots = [];
         $start = Carbon::parse($this->date . ' 09:00');
         $end = Carbon::parse($this->date . ' 17:00');
 
         while($start < $end) {
-            $slots[] = $start->format('H:i');
+            $timeString = $start->format('H:i');
+
+            // 2. Solo agregamos el slot si NO está en la lista de ocupados
+            if (!in_array($timeString, $bookedTimes)) {
+                $slots[] = $timeString;
+            }
+
             $start->addHour(); // Intervalos de 1 hora por simplicidad
         }
         return $slots;

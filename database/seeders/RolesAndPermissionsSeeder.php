@@ -70,7 +70,6 @@ class RolesAndPermissionsSeeder extends Seeder
         // 3. Crear un SuperAdmin inicial
         // Asegúrate de que este usuario tenga la contraseña hasheada
         \App\Models\User::factory()->create([
-            'name' => 'Test User',
             'firstname' => 'Super',
             'lastname' => 'Admin',
             'username' => 'supersu',

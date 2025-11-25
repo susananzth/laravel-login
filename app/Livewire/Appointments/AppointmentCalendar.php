@@ -29,6 +29,7 @@ class AppointmentCalendar extends Component
     {
         $user = Auth::user();
         $query = Appointment::with(['client', 'service', 'technician']);
+        $query->whereBetween('scheduled_at', [now()->startOfYear(), now()->endOfYear()]);
 
         if ($user->hasRole('client')) {
             $query->where('user_id', $user->id);
@@ -49,7 +50,7 @@ class AppointmentCalendar extends Component
 
             $title = $user->hasRole('client')
                 ? $cita->service->name
-                : $cita->client->name . ' - ' . $cita->service->name;
+                : $cita->client->firstname . ' - ' . $cita->service->name;
 
             return [
                 'id' => $cita->id,
@@ -58,7 +59,7 @@ class AppointmentCalendar extends Component
                 'color' => $color,
                 'extendedProps' => [
                     'status' => $cita->status,
-                    'technician' => $cita->technician?->name ?? 'Sin asignar',
+                    'technician' => $cita->technician?->firstname . ' ' . $cita->technician?->lastname ?? 'Sin asignar',
                     'notes' => $cita->notes
                 ]
             ];
@@ -83,6 +84,8 @@ class AppointmentCalendar extends Component
         ]);
 
         $this->showModal = false;
+
+        $this->dispatch('close-modal');
 
         // Emitimos evento para refrescar calendario y notificar
         $this->dispatch('refresh-calendar');

@@ -11,7 +11,8 @@ class ManageUsers extends Component
 {
     use WithPagination;
 
-    public $name, $email, $password, $role;
+    public $firstname, $lastname, $username, $phone, $email, $password;
+    public $roles = [];
     public $userId = null;
     public $showModal = false;
 
@@ -19,9 +20,12 @@ class ManageUsers extends Component
     protected function rules()
     {
         $rules = [
-            'name' => 'required|min:3',
-            'email' => 'required|email|unique:users,email,' . $this->userId,
-            'role' => 'required',
+            'firstname' => 'required|min:2',
+            'lastname'  => 'required|min:2',
+            'username'  => 'required|unique:users,username,' . $this->userId,
+            'phone'     => 'required',
+            'email'     => 'required|email|unique:users,email,' . $this->userId,
+            'roles'     => 'array',
         ];
 
         // Solo requerir password si es usuario nuevo
@@ -44,7 +48,6 @@ class ManageUsers extends Component
     {
         $this->resetInputFields();
         $this->showModal = true;
-        // Importante: Disparar evento para abrir modal
         $this->dispatch('open-modal', 'user-manager-modal');
     }
 
@@ -52,8 +55,11 @@ class ManageUsers extends Component
         $this->validate($this->rules());
 
         $data = [
-            'name' => $this->name,
-            'email' => $this->email,
+            'firstname' => $this->firstname,
+            'lastname'  => $this->lastname,
+            'username'  => $this->username,
+            'phone'     => $this->phone,
+            'email'     => $this->email,
         ];
 
         // Solo encriptamos y guardamos password si el campo tiene valor
@@ -64,7 +70,7 @@ class ManageUsers extends Component
         $user = User::updateOrCreate(['id' => $this->userId], $data);
 
         // Sincronizar rol usando Spatie
-        $user->syncRoles($this->role);
+        $user->syncRoles($this->roles);
 
         $this->showModal = false; // El hook updatedShowModal cerrará el modal visualmente
 
@@ -81,10 +87,12 @@ class ManageUsers extends Component
     {
         $user = User::findOrFail($id);
         $this->userId = $id;
-        $this->name = $user->name;
-        $this->email = $user->email;
-        // Asumiendo que el usuario tiene un solo rol principal
-        $this->role = $user->roles->first()?->name;
+        $this->firstname = $user->firstname;
+        $this->lastname  = $user->lastname;
+        $this->username  = $user->username;
+        $this->phone     = $user->phone;
+        $this->email     = $user->email;
+        $this->roles     = $user->roles->pluck('name')->toArray();
 
         $this->password = ''; // Limpiamos password para no mostrar el hash
 
@@ -108,7 +116,7 @@ class ManageUsers extends Component
 
     private function resetInputFields()
     {
-        $this->reset(['name', 'email', 'password', 'role', 'userId']);
+        $this->reset(['firstname', 'lastname', 'username', 'phone', 'email', 'password', 'roles', 'userId']);
         $this->resetErrorBag();
     }
 
@@ -116,6 +124,7 @@ class ManageUsers extends Component
     {
         return view('livewire.admin.manage-users', [
             'users' => User::with('roles')->latest()->paginate(10),
+            'availableRoles' => Role::all(),
         ]);
     }
 }

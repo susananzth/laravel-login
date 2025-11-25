@@ -16,7 +16,7 @@
                             <div>
                                 <div class="text-xs font-medium text-gray-500 uppercase tracking-wider">Citas para Hoy</div>
                                 <div class="text-4xl font-bold text-moto-black mt-1">
-                                    {{ \App\Models\Appointment::whereDate('scheduled_at', today())->count() }}
+                                    {{ $stats['today'] }}
                                 </div>
                             </div>
                             <i class="fas fa-calendar-alt text-4xl text-moto-red opacity-70"></i>

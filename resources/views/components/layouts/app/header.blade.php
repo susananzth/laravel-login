@@ -32,7 +32,7 @@
                     </div>
 
                     <span class="hidden lg:flex lg:items-center">
-                        <span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{{ auth()->user()->name }}</span>
+                        <span class="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">{{ auth()->user()->firstname . ' ' . auth()->user()->lastname }}</span>
                         <i class="fas fa-chevron-down ml-2 text-xs text-gray-400"></i>
                     </span>
                 </button>

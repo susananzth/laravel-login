@@ -110,15 +110,43 @@
                 </button>
             </div>
 
-            <div class="space-y-5">
-                <x-forms.input
-                    label="Nombre Completo"
-                    name="name"
-                    wireModel="name"
-                    icon="fas fa-user"
-                    placeholder="Ej: Juan Pérez"
-                    required
-                />
+            <div class="p-6 space-y-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <x-forms.input
+                        label="Nombres"
+                        name="firstname"
+                        wireModel="firstname"
+                        icon="fas fa-user"
+                        placeholder="Ej: Juan"
+                        required
+                    />
+                    <x-forms.input
+                        label="Apellidos"
+                        name="lastname"
+                        wireModel="lastname"
+                        placeholder="Ej: Pérez"
+                        required
+                    />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <x-forms.input
+                        label="Usuario"
+                        name="username"
+                        wireModel="username"
+                        icon="fas fa-at"
+                        placeholder="juanperez"
+                        required
+                    />
+                    <x-forms.input
+                        label="Teléfono"
+                        name="phone"
+                        wireModel="phone"
+                        icon="fas fa-phone"
+                        placeholder="999 999 999"
+                        required
+                    />
+                </div>
 
                 <x-forms.input
                     label="Correo Electrónico"
@@ -130,17 +158,30 @@
                     required
                 />
 
-                <x-forms.select
-                    label="Rol de Usuario"
-                    name="role"
-                    wireModel="role"
-                    icon="fas fa-id-badge"
-                    required
-                >
-                    <option value="admin">Administrador</option>
-                    <option value="technician">Técnico de Taller</option>
-                    <option value="client">Cliente</option>
-                </x-forms.select>
+                <div>
+                    <label class="block text-sm font-semibold text-moto-black mb-2">Roles Asignados</label>
+
+                    {{-- Grid de Checkboxes --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50">
+                        @foreach($availableRoles as $role)
+                            <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                <input
+                                    type="checkbox"
+                                    wire:model="roles"
+                                    value="{{ $role->name }}"
+                                    class="form-checkbox h-5 w-5 text-moto-red rounded border-gray-300 focus:ring-moto-red transition duration-150 ease-in-out"
+                                >
+                                <span class="text-sm font-medium text-gray-700 capitalize">
+                                    {{ $role->name }}
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    @error('roles')
+                        <p class="text-red-500 text-sm font-medium mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
 
                 {{-- Solo mostramos password si es creación o si el admin quiere cambiarla --}}
                 <div x-data="{ changePass: {{ $userId ? 'false' : 'true' }} }">
