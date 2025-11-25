@@ -1,8 +1,8 @@
 @props([
     'variant' => 'primary',
     'type' => 'button',
-    'loading' => false,
     'disabled' => false,
+    'icon' => null,
 ])
 
 @php
@@ -22,16 +22,22 @@
     type="{{ $type }}"
     {{ $attributes->merge(['class' => $buttonClasses]) }}
     @if($disabled) disabled @endif
+    {{-- Esto deshabilita el botón automáticamente mientras Livewire carga --}}
     wire:loading.attr="disabled"
-    wire:loading.class="opacity-50 cursor-not-allowed"
+    wire:loading.class="opacity-75 cursor-wait"
 >
-    @if($loading)
-        <i class="fas fa-spinner fa-spin mr-2"></i>
-    @endif
+    {{--
+        SPINNER INTELIGENTE:
+        Solo se muestra cuando Livewire está cargando (wire:loading).
+    --}}
+    <span wire:loading class="animate-spin mr-2">
+        <i class="fas fa-spinner"></i>
+    </span>
 
     {{ $slot }}
 
-    @if($attributes->has('icon'))
-        <i class="{{ $attributes->get('icon') }} ml-2"></i>
+    {{-- Icono estático (opcional) --}}
+    @if($icon)
+        <i class="{{ $icon }} ml-2" wire:loading.remove></i>
     @endif
 </button>
