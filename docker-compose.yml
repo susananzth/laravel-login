@@ -2,29 +2,35 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile # Dockerfile Multi-stage
+      target: app_prod
     container_name: laravel_date_app
-    volumes:
-      - .:/var/www/html
     networks:
       - laravel_date_network
+      - db_shared_network # Red para hablar con DB compartida
     env_file:
       - .env
-    restart: unless-stopped
+    restart: always
 
   web:
-    image: nginx:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web_prod
     container_name: laravel_date_web
     ports:
       - "8004:80"
-    volumes:
-      - .:/var/www/html
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
     networks:
       - laravel_date_network
     depends_on:
       - app
-    restart: unless-stopped
+    restart: always
 
+# Definición de redes
 networks:
   laravel_date_network:
+    driver: bridge
+  # Red externa para conectar con contenedor de MySQL existente
+  db_shared_network:
+    external: true
+    name: shared_services_network

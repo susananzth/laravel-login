@@ -1,0 +1,12 @@
+services:
+  app:
+    volumes:
+      - .:/var/www/html:delegated
+    environment:
+      APP_ENV: local
+      APP_DEBUG: 'true'
+
+  web:
+    volumes:
+      - ./public:/var/www/html/public
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf # Para editar nginx en vivo
