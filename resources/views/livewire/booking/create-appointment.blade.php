@@ -22,6 +22,7 @@
         <x-forms.input
             type="date"
             label="Fecha"
+            name="date"
             wireModel="date"
             min="{{ date('Y-m-d', strtotime('+1 day')) }}"
         />
@@ -44,7 +45,7 @@
             </div>
         @endif
 
-        <x-forms.input label="Notas adicionales (Opcional)" wireModel="notes" />
+        <x-forms.input label="Notas adicionales (Opcional)" name="notes" wireModel="notes" />
 
         <div class="pt-4">
             <x-button type="submit" class="w-full" loading>

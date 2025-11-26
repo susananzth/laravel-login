@@ -12,54 +12,56 @@
 
     {{-- Tabla de Roles --}}
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">Rol</th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">Permisos Asignados</th>
-                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse($roles as $role)
-                    <tr class="hover:bg-gray-50/50 transition duration-150">
-                        <td class="px-6 py-4 whitespace-nowrap font-bold text-moto-black">
-                            {{ ucfirst($role->name) }}
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex flex-wrap gap-1">
-                                @forelse($role->permissions as $perm)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                                        {{ $perm->name }}
-                                    </span>
-                                @empty
-                                    <span class="text-gray-400 text-xs italic">Sin permisos</span>
-                                @endforelse
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button wire:click="edit({{ $role->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3" title="Editar">
-                                <i class="fas fa-edit text-lg"></i>
-                            </button>
-                            @unless(in_array($role->name, ['admin', 'client', 'technician']))
-                                <button wire:click="delete({{ $role->id }})"
-                                    onclick="confirm('¿Estás seguro(a) de eliminar este rol? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
-                                        class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
-                                    <i class="fas fa-trash text-lg"></i>
-                                </button>
-                            @endunless
-                        </td>
-                    </tr>
-                @empty
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <td colspan="3" class="px-6 py-10 text-center text-gray-500">
-                            <i class="fas fa-users-slash text-4xl mb-3 text-gray-300"></i>
-                            <p>No hay roles registrados aún.</p>
-                        </td>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">Rol</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">Permisos Asignados</th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase">Acciones</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($roles as $role)
+                        <tr class="hover:bg-gray-50/50 transition duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap font-bold text-moto-black">
+                                {{ ucfirst($role->name) }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-wrap gap-1">
+                                    @forelse($role->permissions as $perm)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                            {{ $perm->name }}
+                                        </span>
+                                    @empty
+                                        <span class="text-gray-400 text-xs italic">Sin permisos</span>
+                                    @endforelse
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button wire:click="edit({{ $role->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3" title="Editar">
+                                    <i class="fas fa-edit text-lg"></i>
+                                </button>
+                                @unless(in_array($role->name, ['admin', 'client', 'technician']))
+                                    <button wire:click="delete({{ $role->id }})"
+                                        onclick="confirm('¿Estás seguro(a) de eliminar este rol? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
+                                            class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
+                                        <i class="fas fa-trash text-lg"></i>
+                                    </button>
+                                @endunless
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-10 text-center text-gray-500">
+                                <i class="fas fa-box-open text-4xl mb-3 text-gray-300"></i>
+                                <p>No hay roles registrados aún.</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
     {{-- MODAL DE ROLES --}}
@@ -76,7 +78,7 @@
             </div>
 
             <div class="space-y-5 max-h-[70vh] overflow-y-auto">
-                <x-forms.input label="Nombre del Rol" wireModel="name" placeholder="Ej: supervisor" required />
+                <x-forms.input label="Nombre del Rol" name="name" wireModel="name" placeholder="Ej: supervisor" required />
 
                 <div>
                     <h4 class="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider border-b pb-1">Permisos</h4>

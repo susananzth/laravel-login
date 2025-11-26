@@ -81,7 +81,7 @@
                     @empty
                         <tr>
                             <td colspan="4" class="px-6 py-10 text-center text-gray-500">
-                                <i class="fas fa-users-slash text-4xl mb-3 text-gray-300"></i>
+                                <i class="fas fa-box-open text-4xl mb-3 text-gray-300"></i>
                                 <p>No hay usuarios registrados aún.</p>
                             </td>
                         </tr>

@@ -16,10 +16,15 @@ class ManageRoles extends Component
     public $roleId = null;
     public $showModal = false;
 
-    protected $rules = [
-        'name' => 'required|unique:roles,name',
-        'selectedPermissions' => 'array'
-    ];
+    protected function rules()
+    {
+        $rules = [
+            'name' => 'required|min:4|unique:roles,name,' . $this->roleId,
+            'selectedPermissions' => 'array'
+        ];
+
+        return $rules;
+    }
 
     public function updatedShowModal($value)
     {
@@ -49,10 +54,7 @@ class ManageRoles extends Component
 
     public function save()
     {
-        $this->validate([
-            'name' => 'required|unique:roles,name,' . $this->roleId,
-            'selectedPermissions' => 'array'
-        ]);
+        $this->validate($this->rules());
 
         $role = Role::updateOrCreate(['id' => $this->roleId], ['name' => $this->name]);
 

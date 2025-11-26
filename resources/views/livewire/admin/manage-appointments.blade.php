@@ -75,7 +75,7 @@
                     @empty
                         <tr>
                             <td colspan="5" class="px-6 py-10 text-center text-gray-500">
-                                <i class="fas fa-users-slash text-4xl mb-3 text-gray-300"></i>
+                                <i class="fas fa-box-open text-4xl mb-3 text-gray-300"></i>
                                 <p>No hay citas registrados aún.</p>
                             </td>
                         </tr>
@@ -116,11 +116,11 @@
 
                 {{-- Edición de Fecha y Hora --}}
                 <div class="grid grid-cols-2 gap-4">
-                    <x-forms.input type="date" label="Fecha" wireModel="date" required />
-                    <x-forms.input type="time" label="Hora" wireModel="time" required />
+                    <x-forms.input type="date" label="Fecha" name="date" wireModel="date" required />
+                    <x-forms.input type="time" label="Hora" name="time" wireModel="time" required />
                 </div>
 
-                <x-forms.select label="Técnico" wireModel="technician_id" icon="fas fa-user-cog">
+                <x-forms.select label="Técnico" name="technician_id" wireModel="technician_id" icon="fas fa-user-cog">
                     <option value="">-- Sin Asignar --</option>
                     @foreach($technicians as $tech)
                         <option value="{{ $tech->id }}">
@@ -129,7 +129,7 @@
                     @endforeach
                 </x-forms.select>
 
-                <x-forms.select label="Estado" wireModel="status" required icon="fas fa-info-circle">
+                <x-forms.select label="Estado" name="status" wireModel="status" required icon="fas fa-info-circle">
                     <option value="pending">Pendiente</option>
                     <option value="confirmed">Confirmada</option>
                     <option value="in_progress">En Proceso</option>
@@ -137,7 +137,7 @@
                     <option value="cancelled">Cancelada</option>
                 </x-forms.select>
 
-                <x-forms.input label="Notas" wireModel="notes" />
+                <x-forms.input label="Notas" name="notes" wireModel="notes" />
             </div>
 
             <x-slot name="footer">

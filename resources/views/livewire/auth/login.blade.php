@@ -9,6 +9,7 @@
 
     <form method="POST" wire:submit="login" class="space-y-6">
         <x-forms.input
+            name="email"
             wireModel="email"
             :label="__('Correo electrónico')"
             type="email"
@@ -19,6 +20,7 @@
         />
 
         <x-forms.input
+            name="password"
             wireModel="password"
             :label="__('Contraseña')"
             type="password"
