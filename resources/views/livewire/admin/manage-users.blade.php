@@ -29,10 +29,11 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10 rounded-full bg-moto-black text-white flex items-center justify-center font-bold text-sm">
-                                        {{ substr($user->name, 0, 2) }}
+                                        {{ substr($user->firstname, 0, 1) }}
+                                        {{ substr($user->lastname, 0, 1) }}
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $user->firstname . ' ' . $user->lastname }}</div>
                                         <div class="text-sm text-gray-500">{{ $user->email }}</div>
                                     </div>
                                 </div>
@@ -98,9 +99,8 @@
     {{-- MODAL DE CREACIÓN / EDICIÓN --}}
     <x-modal name="user-manager-modal" :show="$showModal" maxWidth="md">
         <form wire:submit.prevent="save" id="userForm">
-
             {{-- Cabecera del Modal (Consistente con el calendario) --}}
-            <div class="bg-gray-50 pb-6 border-b border-gray-100 flex justify-between items-center rounded-t-lg">
+            <div class="pb-6 border-b border-gray-100 flex justify-between items-center rounded-t-lg">
                 <h3 class="text-lg font-bold text-moto-black flex items-center">
                     <i class="fas {{ $userId ? 'fa-user-edit' : 'fa-user-plus' }} text-moto-red mr-2"></i>
                     {{ $userId ? 'Editar Usuario' : 'Nuevo Usuario' }}
@@ -110,7 +110,7 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-5">
+            <div class="space-y-5">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <x-forms.input
                         label="Nombres"

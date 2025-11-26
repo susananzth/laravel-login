@@ -4,7 +4,8 @@
 
             @role('admin')
                 <h2 class="text-3xl font-extrabold text-moto-black border-b pb-2 mb-6">
-                    Panel de Administración ⚙️
+                    <i class="fas fa-gear text-gray-500 me-1"></i>
+                    Panel de Administración
                 </h2>
 
                 {{-- Tarjetas de Resumen (Dashboard Cards) --}}
@@ -40,7 +41,9 @@
 
             {{-- Sección de Calendario --}}
             <div class="p-6 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                <h3 class="text-2xl font-bold text-moto-black my-3">Calendario de Citas 🗓️</h3>
+                <h3 class="text-2xl font-bold text-moto-black my-3">
+                    <i class="fas fa-calendar-days text-moto-red me-1"></i> Calendario de Citas
+                </h3>
                 <livewire:appointments.appointment-calendar />
             </div>
 

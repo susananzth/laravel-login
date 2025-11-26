@@ -62,7 +62,7 @@
             </div>
 
             @if (isset($footer))
-                <div class="bg-gray-50 p-6 pt-0 sm:flex">
+                <div class="p-6 pt-0 sm:flex">
                     {{ $footer }}
                 </div>
             @endif

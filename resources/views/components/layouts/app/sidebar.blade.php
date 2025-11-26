@@ -70,7 +70,7 @@
 
                 {{-- Menú de usuario al pie del sidebar --}}
                 <li class="mt-auto">
-                    <a href="{{ route('settings.profile') }}" class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-zinc-800 hover:text-white transition">
+                    <a href="{{ route('settings.profile') }}" class="group -mx-2 flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-zinc-800 hover:text-white transition">
                         <i class="fas fa-cog text-gray-400 group-hover:text-white shrink-0 mt-1"></i>
                         Configuración
                     </a>

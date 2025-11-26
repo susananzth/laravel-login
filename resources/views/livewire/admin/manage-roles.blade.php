@@ -52,17 +52,18 @@
 
     {{-- MODAL DE ROLES --}}
     <x-modal name="role-manager-modal" :show="$showModal" maxWidth="2xl">
-        <form wire:submit.prevent="save">
-            <div class="bg-gray-50 pb-4 border-b border-gray-100 px-6 pt-6 flex justify-between items-center rounded-t-lg">
-                <h3 class="text-lg font-bold text-moto-black">
+        <form wire:submit.prevent="save" id="roleForm">
+            <div class="pb-6 border-b border-gray-100 flex justify-between items-center rounded-t-lg">
+                <h3 class="text-lg font-bold text-moto-black flex items-center">
+                    <i class="fas {{ $roleId ? 'fa-pen-to-square' : 'fa-plus' }} text-moto-red mr-2"></i>
                     {{ $roleId ? 'Editar Rol' : 'Crear Nuevo Rol' }}
                 </h3>
-                <button type="button" wire:click="$set('showModal', false)" class="text-gray-400 hover:text-moto-red">
+                <button type="button" wire:click="$set('showModal', false)" class="text-gray-400 hover:text-moto-red transition">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
-            <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+            <div class="space-y-5 max-h-[70vh] overflow-y-auto">
                 <x-forms.input label="Nombre del Rol" wireModel="name" placeholder="Ej: supervisor" required />
 
                 <div>
@@ -94,10 +95,14 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50 px-6 py-4 flex flex-row-reverse rounded-b-lg">
-                <x-button type="submit">Guardar Rol</x-button>
-                <x-button type="button" variant="secondary" class="mr-3" wire:click="$set('showModal', false)">Cancelar</x-button>
-            </div>
+            <x-slot name="footer">
+                <x-button type="button" variant="secondary" wire:click="$set('showModal', false)">
+                    Cancelar
+                </x-button>
+                <x-button type="submit" variant="primary" class="ml-3" form="roleForm">
+                    {{ $roleId ? 'Actualizar' : 'Guardar Rol' }}
+                </x-button>
+            </x-slot>
         </form>
     </x-modal>
 </div>

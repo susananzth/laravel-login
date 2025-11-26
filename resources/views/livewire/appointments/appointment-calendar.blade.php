@@ -1,7 +1,7 @@
 <div>
     {{-- Leyenda de Estados --}}
     <div class="mb-6 flex flex-wrap justify-end items-center border-b pb-4">
-        <div class="flex gap-3 text-sm text-gray-700 mt-2 sm:mt-0">
+        <div class="flex flex-wrap md:flex-nowrap gap-3 text-sm text-gray-700 mt-2 sm:mt-0">
             <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-500 mr-1 shadow"></span> Pendiente</span>
             <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-1 shadow"></span> Confirmada</span>
             <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-1 shadow"></span> Completada</span>
@@ -58,12 +58,11 @@
         <x-modal name="admin-appointment-manager" :show="$showModal" maxWidth="lg">
 
             <form wire:submit.prevent="updateAppointment" id="appointmentForm">
-                <div class="bg-gray-50 pb-6 border-b border-gray-100 flex justify-between items-center rounded-t-lg">
+                <div class="pb-6 border-b border-gray-100 flex justify-between items-center rounded-t-lg">
                     <h3 class="text-lg font-bold text-moto-black flex items-center">
                         <i class="fas fa-motorcycle text-moto-red mr-2"></i>
                         Gestionar Cita #{{ $selectedAppointment?->id }}
                     </h3>
-                    {{-- Botón X discreto para cerrar --}}
                     <button type="button" wire:click="$set('showModal', false)" class="text-gray-400 hover:text-moto-red transition">
                         <i class="fas fa-times"></i>
                     </button>
@@ -73,7 +72,9 @@
                 <div class="grid grid-cols-2 gap-4 bg-blue-50/50 p-4 rounded-lg border border-blue-100 mb-6">
                     <div>
                         <span class="block text-xs text-gray-500 uppercase tracking-wider font-semibold">Cliente</span>
-                        <span class="text-moto-black font-medium">{{ $selectedAppointment?->client->name }}</span>
+                        <span class="text-moto-black font-medium">
+                            {{ $selectedAppointment?->client->firstname . ' ' . $selectedAppointment?->client->lastname }}
+                        </span>
                     </div>
                     <div>
                         <span class="block text-xs text-gray-500 uppercase tracking-wider font-semibold">Servicio</span>
@@ -98,7 +99,7 @@
                         placeholder="-- Seleccionar Técnico --"
                     >
                         @foreach($technicians as $tech)
-                            <option value="{{ $tech->id }}">{{ $tech->name }}</option>
+                            <option value="{{ $tech->id }}">{{ $tech->firstname . ' ' . $tech->lastname }}</option>
                         @endforeach
                     </x-forms.select>
 

@@ -28,13 +28,13 @@
                                 <div class="text-sm text-gray-500">{{ $cita->scheduled_at->format('d/m/Y H:i') }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-sm font-medium text-gray-900">{{ $cita->client->name }}</div>
+                                <div class="text-sm font-medium text-gray-900">{{ $cita->client->firstname . ' ' . $cita->client->lastname }}</div>
                                 <div class="text-xs text-gray-500 bg-gray-100 inline-block px-2 py-0.5 rounded">{{ $cita->service->name }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 @if($cita->technician)
                                     <span class="flex items-center text-blue-600 font-medium">
-                                        <i class="fas fa-wrench text-xs mr-1"></i> {{ $cita->technician->name }}
+                                        <i class="fas fa-wrench text-xs mr-1"></i> {{ $cita->technician->firstname . ' ' . $cita->technician->lastname }}
                                     </span>
                                 @else
                                     <span class="text-gray-400 italic">-- Sin asignar --</span>
@@ -87,14 +87,18 @@
 
     {{-- MODAL DE EDICIÓN --}}
     <x-modal name="appointment-manager-modal" :show="$showModal" maxWidth="lg">
-        <form wire:submit.prevent="save">
-            <div class="bg-gray-50 pb-6 border-b border-gray-100 flex justify-between items-center rounded-t-lg">
-                <h3 class="text-lg font-bold text-moto-black px-6 pt-4">
+        <form wire:submit.prevent="save" id="appointmentForm">
+            <div class="pb-6 border-b border-gray-100 flex justify-between items-center rounded-t-lg">
+                <h3 class="text-lg font-bold text-moto-black flex items-center">
+                    <i class="fas fa-pen-to-square text-moto-red mr-2"></i>
                     Editar Cita #{{ $appointmentId }}
                 </h3>
+                <button type="button" wire:click="$set('showModal', false)" class="text-gray-400 hover:text-moto-red transition">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
-            <div class="p-6 space-y-4">
+            <div class="space-y-5">
                 {{-- Info solo lectura --}}
                 <div class="grid grid-cols-2 gap-4 bg-blue-50 p-3 rounded-lg text-sm mb-4">
                     <div>
@@ -116,7 +120,9 @@
                 <x-forms.select label="Técnico" wireModel="technician_id" icon="fas fa-user-cog">
                     <option value="">-- Sin Asignar --</option>
                     @foreach($technicians as $tech)
-                        <option value="{{ $tech->id }}">{{ $tech->name }}</option>
+                        <option value="{{ $tech->id }}">
+                            {{ $tech->firstname . ' ' . $tech->lastname }}
+                        </option>
                     @endforeach
                 </x-forms.select>
 
@@ -131,10 +137,14 @@
                 <x-forms.input label="Notas" wireModel="notes" />
             </div>
 
-            <div class="bg-gray-50 px-6 py-4 flex flex-row-reverse">
-                <x-button type="submit">Guardar Cambios</x-button>
-                <x-button type="button" variant="secondary" class="mr-3" wire:click="$set('showModal', false)">Cancelar</x-button>
-            </div>
+            <x-slot name="footer">
+                <x-button type="button" variant="secondary" wire:click="$set('showModal', false)">
+                    Cancelar
+                </x-button>
+                <x-button type="submit" variant="primary" class="ml-3" form="appointmentForm">
+                    Actualizar
+                </x-button>
+            </x-slot>
         </form>
     </x-modal>
 </div>

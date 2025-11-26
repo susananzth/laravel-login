@@ -56,11 +56,17 @@ class User extends Authenticatable
      */
     public function initials(): string
     {
-        return Str::of($this->firstname)
+        $firstname_initial = Str::of($this->firstname)
             ->explode(' ')
-            ->take(2)
+            ->take(1)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+        $lastname_initial = Str::of($this->lastname)
+            ->explode(' ')
+            ->take(1)
+            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->implode('');
+        return $firstname_initial . $lastname_initial;
     }
 
     // Citas como cliente
