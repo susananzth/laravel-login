@@ -3,10 +3,11 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="bg-white font-sans">
+    <body class="bg-white font-sans flex flex-col min-h-screen antialiased text-gray-900">
+
         @include('partials.nav-guest')
 
-        <main>
+        <main class="flex-grow">
             {{ $slot }}
         </main>
 
