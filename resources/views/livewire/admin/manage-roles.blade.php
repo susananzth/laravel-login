@@ -29,13 +29,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex flex-wrap gap-1">
-                                    @forelse($role->permissions as $perm)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                                            {{ $perm->name }}
-                                        </span>
-                                    @empty
-                                        <span class="text-gray-400 text-xs italic">Sin permisos</span>
-                                    @endforelse
+                                    {{ count($role->permissions) }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -78,7 +72,21 @@
             </div>
 
             <div class="space-y-5 max-h-[70vh] overflow-y-auto">
-                <x-forms.input label="Nombre del Rol" name="name" wireModel="name" placeholder="Ej: supervisor" required />
+                <x-forms.input
+                    label="Nombre del Rol"
+                    name="name"
+                    wireModel="name"
+                    placeholder="Ej: supervisor"
+                    required
+                    {{-- Si es rol de sistema (admin/client/technician), lo deshabilitamos visualmente --}}
+                    :disabled="in_array($name, ['admin', 'client', 'technician']) && $roleId"
+                    class="{{ in_array($name, ['admin', 'client', 'technician']) && $roleId ? 'bg-gray-100 cursor-not-allowed' : '' }}"
+                />
+                @if(in_array($name, ['admin', 'client', 'technician']) && $roleId)
+                    <p class="text-xs text-yellow-600 mt-1">
+                        <i class="fas fa-lock mr-1"></i> Este es un rol del sistema, no se puede renombrar.
+                    </p>
+                @endif
 
                 <div>
                     <h4 class="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider border-b pb-1">Permisos</h4>
@@ -90,16 +98,13 @@
                                 <div class="space-y-2">
                                     @foreach($perms as $perm)
                                         <div class="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                wire:model="selectedPermissions"
+                                            <x-checkbox
+                                                wireModel="selectedPermissions"
+                                                name="selectedPermissions[]"
                                                 value="{{ $perm->name }}"
-                                                id="perm_{{ $perm->id }}"
-                                                class="rounded border-gray-300 text-moto-red shadow-sm focus:border-moto-red focus:ring focus:ring-moto-red focus:ring-opacity-50"
-                                            >
-                                            <label for="perm_{{ $perm->id }}" class="ml-2 text-sm text-gray-700 cursor-pointer">
-                                                {{ str_replace($group.'.', '', $perm->name) }}
-                                            </label>
+                                                checkboxId="perm_{{ $perm->id }}"
+                                                label="{{ __($perm->name) }}"
+                                            />
                                         </div>
                                     @endforeach
                                 </div>

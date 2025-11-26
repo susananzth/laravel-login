@@ -74,14 +74,11 @@ class ManageAppointments extends Component
 
     public function delete($id)
     {
-        // En lugar de borrar físicamente, un admin suele CANCELAR
-        // Pero si quieres borrar: Appointment::find($id)->delete();
-
         $cita = Appointment::find($id);
         $cita->status = 'cancelled';
         $cita->save();
 
-        // $this->dispatch('notify', 'Cita cancelada');
+        // FALTA $this->dispatch('notify', 'Cita cancelada');
     }
 
     public function render()
@@ -90,7 +87,7 @@ class ManageAppointments extends Component
             ->latest('scheduled_at')
             ->paginate(10);
 
-        $technicians = User::role('technician')->get();
+        $technicians = User::permission('appointments.be_assigned')->get();
 
         return view('livewire.admin.manage-appointments', [
             'appointments' => $appointments,

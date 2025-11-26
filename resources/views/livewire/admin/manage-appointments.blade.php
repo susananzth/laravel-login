@@ -50,16 +50,8 @@
                                         'cancelled' => 'red',
                                         default => 'gray'
                                     };
-                                    $label = match($cita->status) {
-                                        'pending' => 'Pendiente',
-                                        'confirmed' => 'Confirmada',
-                                        'in_progress' => 'En Taller',
-                                        'completed' => 'Finalizada',
-                                        'cancelled' => 'Cancelada',
-                                        default => $cita->status
-                                    };
                                 @endphp
-                                <x-badge :color="$color" :label="$label" />
+                                <x-badge :color="$color" :label="__( $label )" />
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <button wire:click="edit({{ $cita->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3" title="Editar">
@@ -110,7 +102,7 @@
                     </div>
                     <div>
                         <span class="block text-gray-500 text-xs uppercase">Servicio</span>
-                        <span class="font-bold text-gray-800">{{ $service_name }}</span>
+                        <span class="font-bold text-gray-800">{{ __($service_name) }}</span>
                     </div>
                 </div>
 

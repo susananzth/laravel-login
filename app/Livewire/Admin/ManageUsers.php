@@ -110,7 +110,7 @@ class ManageUsers extends Component
                 return;
             }
             User::find($id)->delete();
-            // Opcional: Emitir notificación
+            // FALTA: Emitir notificación
         }
     }
 

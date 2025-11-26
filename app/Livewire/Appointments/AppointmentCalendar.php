@@ -31,10 +31,10 @@ class AppointmentCalendar extends Component
         $query = Appointment::with(['client', 'service', 'technician']);
         $query->whereBetween('scheduled_at', [now()->startOfYear(), now()->endOfYear()]);
 
-        if ($user->hasRole('client')) {
-            $query->where('user_id', $user->id);
-        } elseif ($user->hasRole('technician')) {
+        if ($user->can('appointments.be_assigned')) {
             $query->where('technician_id', $user->id);
+        } else {
+            $query->where('user_id', $user->id);
         }
         // Si es Admin, ve todo (no entra en los if anteriores)
 
@@ -116,9 +116,11 @@ class AppointmentCalendar extends Component
         if ($user->hasRole('client') && $cita->user_id !== $user->id) abort(403);
         if ($user->hasRole('technician')) return; // Técnicos no mueven citas
 
-        // El cliente solo puede mover si falta más de 24hrs (Regla de negocio común)
+        // El cliente solo puede mover si falta más de 24hrs
         if ($user->hasRole('client') && $cita->scheduled_at->diffInHours(now()) < 24) {
-            $this->dispatch('notify', 'No se puede reprogramar con menos de 24h de antelación.');
+            $this->dispatch('error', 'No se puede reprogramar con menos de 24h de antelación.');
+            $this->dispatch('refresh-calendar');
+
             return;
         }
 
@@ -128,8 +130,7 @@ class AppointmentCalendar extends Component
 
     public function render()
     {
-        // Obtener solo usuarios con rol 'technician'
-        $technicians = User::role('technician')->get();
+        $technicians = User::permission('appointments.be_assigned')->get();
 
         return view('livewire.appointments.appointment-calendar', [
             'technicians' => $technicians

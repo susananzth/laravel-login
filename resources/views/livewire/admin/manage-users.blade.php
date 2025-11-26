@@ -49,15 +49,8 @@
                                             'client' => 'green',
                                             default => 'gray'
                                         };
-                                        // Traducción simple para visualización
-                                        $roleName = match($role->name) {
-                                            'admin' => 'Administrador',
-                                            'technician' => 'Técnico',
-                                            'client' => 'Cliente',
-                                            default => ucfirst($role->name)
-                                        };
                                     @endphp
-                                    <x-badge :color="$badgeColor" :label="$roleName" />
+                                    <x-badge :color="__( $role->name )" :label="$roleName" />
                                 @endforeach
                             </td>
 

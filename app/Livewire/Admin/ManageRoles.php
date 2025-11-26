@@ -14,12 +14,13 @@ class ManageRoles extends Component
     public $name;
     public $selectedPermissions = []; // Array de IDs de permisos seleccionados
     public $roleId = null;
+    public $isSystemRole = false;
     public $showModal = false;
 
     protected function rules()
     {
         $rules = [
-            'name' => 'required|min:4|unique:roles,name,' . $this->roleId,
+            'name' => 'required|min:3|unique:roles,name,' . $this->roleId,
             'selectedPermissions' => 'array'
         ];
 
@@ -42,6 +43,9 @@ class ManageRoles extends Component
     public function edit($id)
     {
         $role = Role::findOrFail($id);
+
+        $this->isSystemRole = in_array($role->name, ['admin', 'client', 'technician']);
+
         $this->roleId = $id;
         $this->name = $role->name;
         // Cargar permisos actuales del rol (solo IDs)
@@ -54,9 +58,35 @@ class ManageRoles extends Component
 
     public function save()
     {
-        $this->validate($this->rules());
+        $rules = [
+            'selectedPermissions' => 'array'
+        ];
 
-        $role = Role::updateOrCreate(['id' => $this->roleId], ['name' => $this->name]);
+        // Verificamos si es rol de sistema antes de guardar
+        $isSystemRole = false;
+        if ($this->roleId) {
+            $existingRole = Role::find($this->roleId);
+            $isSystemRole = in_array($existingRole->name, ['admin', 'client', 'technician']);
+        }
+
+        if (!$isSystemRole) {
+            $rules['name'] = 'required|min:3|unique:roles,name,' . $this->roleId;
+        }
+
+        $this->validate($rules);
+
+        if ($this->roleId) {
+            $role = Role::find($this->roleId);
+
+            // SOLO actualizamos el nombre si NO es de sistema
+            if (!$isSystemRole) {
+                $role->name = $this->name;
+                $role->save();
+            }
+        } else {
+            // Crear nuevo rol
+            $role = Role::create(['name' => $this->name]);
+        }
 
         // Sincronizar permisos (usando nombres de permisos)
         $role->syncPermissions($this->selectedPermissions);
@@ -83,7 +113,6 @@ class ManageRoles extends Component
         return view('livewire.admin.manage-roles', [
             'roles' => Role::with('permissions')->paginate(10),
             'permissions' => Permission::all()->groupBy(function($data) {
-                // Agrupar permisos por 'recurso' (ej: users, appointments)
                 return explode('.', $data->name)[0];
             })
         ]);

@@ -18,52 +18,56 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // 1. Permisos del Sistema (Granularidad fina)
+        // 1. Definición de Permisos (Keys técnicos)
         $permissions = [
-            // Usuarios y Roles
+            // Usuarios
             'users.view', 'users.create', 'users.edit', 'users.delete',
+            // Roles
             'roles.view', 'roles.create', 'roles.edit', 'roles.delete',
-
+            // Servicios
+            'services.view', 'services.create', 'services.edit', 'services.delete',
             // Citas
-            'appointments.view_all', // Ver todas las citas (Admin/Recepcionista)
-            'appointments.view_own', // Ver mis citas (Cliente/Técnico)
+            'appointments.view_all', // Ver todo (Admin)
+            'appointments.view_own', // Ver propio (Cliente/Técnico)
             'appointments.create',
-            'appointments.edit',     // Reprogramar/Editar
+            'appointments.be_assigned',
+            'appointments.edit',     // Reagendar
             'appointments.cancel',
-
-            // Gestión Técnica
             'appointments.assign',   // Asignar técnico
-            'appointments.complete', // Marcar como completada
+            'appointments.complete', // Finalizar trabajo
         ];
 
         foreach ($permissions as $permission) {
             Permission::findOrCreate($permission);
         }
 
-        // 2. Roles Base y sus Permisos
+        // 2. Roles y Asignación
 
-        // ADMIN: Todo
+        // ADMIN: Todo (Superpoder)
         $roleAdmin = Role::create(['name' => 'admin']);
         $roleAdmin->givePermissionTo(Permission::all());
 
-        // TÉCNICO: Ve sus citas y las completa
+        // TÉCNICO
         $roleTech = Role::create(['name' => 'technician']);
         $roleTech->givePermissionTo([
             'appointments.view_own',
-            'appointments.complete'
+            'appointments.be_assigned',
+            'appointments.complete',
+            'services.view' // Para ver el catálogo
         ]);
 
-        // CLIENTE: Ve sus citas, crea y cancela (si no es tarde)
+        // CLIENTE
         $roleClient = Role::create(['name' => 'client']);
         $roleClient->givePermissionTo([
             'appointments.view_own',
             'appointments.create',
-            'appointments.cancel'
+            'appointments.cancel',
+            'services.view'
         ]);
 
-        // 3. Usuarios Iniciales
+        // 3. Usuarios
         $admin = User::factory()->create([
-            'firstname' => 'Admin MotoRapido',
+            'firstname' => 'Admin',
             'lastname' => 'MotoRapido',
             'email' => 'admin@motorapido.com',
             'password' => bcrypt('password'),
