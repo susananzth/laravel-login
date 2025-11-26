@@ -6,6 +6,7 @@ use App\Livewire\Settings\Profile;
 use App\Livewire\Booking\CreateAppointment;
 use App\Livewire\Admin\ManageAppointments;
 use App\Livewire\Admin\ManageRoles;
+use App\Livewire\Admin\ManageServices;
 use App\Livewire\Admin\ManageUsers;
 use App\Models\Appointment;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,7 @@ Route::middleware(['auth'])->group(function () {
     // 4. Rutas para ADMINISTRADORES
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/appointments', ManageAppointments::class)->name('admin.appointments');
+        Route::get('/admin/services', ManageServices::class)->name('admin.services');
         Route::get('/admin/roles', ManageRoles::class)->name('admin.roles');
         Route::get('/admin/users', ManageUsers::class)->name('admin.users');
         // Aquí podrías agregar reportes o configuraciones extra
