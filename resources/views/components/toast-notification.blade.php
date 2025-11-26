@@ -14,8 +14,8 @@
             this.notifications = this.notifications.filter(n => n.id !== id);
         }
     }"
-    x-on:notify.window="add($event.detail, 'success')"
-    x-on:error.window="add($event.detail, 'error')"
+    x-on:notify.window="add($event.detail[0] || $event.detail, 'success')"
+    x-on:error.window="add($event.detail[0] || $event.detail, 'error')"
     class="fixed top-4 right-4 z-[100] space-y-2 w-full max-w-xs pointer-events-none"
 >
     <template x-for="notification in notifications" :key="notification.id">
