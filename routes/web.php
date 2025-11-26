@@ -52,4 +52,8 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+Route::get('/test-403', function () { abort(403); });
+Route::get('/test-404', function () { abort(404); });
+Route::get('/test-500', function () { abort(500); });
+
 require __DIR__.'/auth.php';
