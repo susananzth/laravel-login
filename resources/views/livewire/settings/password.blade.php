@@ -1,39 +1,37 @@
-<section class="w-full">
-    @include('partials.settings-heading')
+<x-settings.layout :heading="__('Actualizar Contraseña')" :subheading="__('Asegura tu cuenta usando una contraseña larga y segura.')">
+    <form wire:submit="updatePassword" class="space-y-6 max-w-xl">
 
-    <x-settings.layout :heading="__('Update password')" :subheading="__('Ensure your account is using a long, random password to stay secure')">
-        <form method="POST" wire:submit="updatePassword" class="mt-6 space-y-6">
-            <flux:input
-                wire:model="current_password"
-                :label="__('Current password')"
-                type="password"
-                required
-                autocomplete="current-password"
-            />
-            <flux:input
-                wire:model="password"
-                :label="__('New password')"
-                type="password"
-                required
-                autocomplete="new-password"
-            />
-            <flux:input
-                wire:model="password_confirmation"
-                :label="__('Confirm Password')"
-                type="password"
-                required
-                autocomplete="new-password"
-            />
+        <x-forms.input
+            label="Contraseña Actual"
+            name="current_password"
+            type="password"
+            wireModel="current_password"
+            required
+            viewable
+        />
 
-            <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>
-                </div>
+        <x-forms.input
+            label="Nueva Contraseña"
+            name="password"
+            type="password"
+            wireModel="password"
+            required
+            viewable
+        />
 
-                <x-action-message class="me-3" on="password-updated">
-                    {{ __('Saved.') }}
-                </x-action-message>
-            </div>
-        </form>
-    </x-settings.layout>
-</section>
+        <x-forms.input
+            label="Confirmar Contraseña"
+            name="password_confirmation"
+            type="password"
+            wireModel="password_confirmation"
+            required
+            viewable
+        />
+
+        <div class="flex justify-end pt-4">
+            <x-button type="submit">
+                {{ __('Guardar Contraseña') }}
+            </x-button>
+        </div>
+    </form>
+</x-settings.layout>

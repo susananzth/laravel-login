@@ -14,6 +14,7 @@
 
         @fluxScripts
 
+        <x-toast-notification />
         @livewireScripts
 
         <style>
