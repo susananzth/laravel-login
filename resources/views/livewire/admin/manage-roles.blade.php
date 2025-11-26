@@ -1,10 +1,13 @@
 <div class="space-y-6">
-    <div class="flex justify-between items-center">
+    {{-- Encabezado de la Sección --}}
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
             <h2 class="text-2xl font-bold text-moto-black">Roles y Permisos</h2>
             <p class="text-gray-600 text-sm">Define qué pueden hacer los usuarios en el sistema.</p>
         </div>
-        <x-button wire:click="create" icon="fas fa-shield-alt">Nuevo Rol</x-button>
+        <x-button wire:click="create" icon="fas fa-plus">
+            Nuevo Rol
+        </x-button>
     </div>
 
     {{-- Tabla de Roles --}}
@@ -18,8 +21,8 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @foreach($roles as $role)
-                    <tr class="hover:bg-gray-50/50">
+                @forelse($roles as $role)
+                    <tr class="hover:bg-gray-50/50 transition duration-150">
                         <td class="px-6 py-4 whitespace-nowrap font-bold text-moto-black">
                             {{ ucfirst($role->name) }}
                         </td>
@@ -34,18 +37,27 @@
                                 @endforelse
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-right text-sm font-medium">
-                            <button wire:click="edit({{ $role->id }})" class="text-blue-600 hover:text-blue-900 mr-3">
-                                <i class="fas fa-edit"></i>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button wire:click="edit({{ $role->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3" title="Editar">
+                                <i class="fas fa-edit text-lg"></i>
                             </button>
                             @unless(in_array($role->name, ['admin', 'client', 'technician']))
-                                <button wire:click="delete({{ $role->id }})" class="text-red-600 hover:text-red-900">
-                                    <i class="fas fa-trash"></i>
+                                <button wire:click="delete({{ $role->id }})"
+                                    onclick="confirm('¿Estás seguro(a) de eliminar este rol? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
+                                        class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
+                                    <i class="fas fa-trash text-lg"></i>
                                 </button>
                             @endunless
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="3" class="px-6 py-10 text-center text-gray-500">
+                            <i class="fas fa-users-slash text-4xl mb-3 text-gray-300"></i>
+                            <p>No hay roles registrados aún.</p>
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -110,8 +122,11 @@
 @script
 <script>
     Livewire.on('show-role-modal-changed', ([value]) => {
-        if (value) { $dispatch('open-modal', 'role-manager-modal'); }
-        else { $dispatch('close-modal'); }
+        if (value) {
+            $dispatch('open-modal', 'role-manager-modal');
+        } else {
+            $dispatch('close-modal');
+        }
     });
 </script>
 @endscript

@@ -1,5 +1,5 @@
 <div class="space-y-6">
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
             <h2 class="text-2xl font-bold text-moto-black">Gestión de Citas</h2>
             <p class="text-gray-600 text-sm">Vista tabular para control administrativo.</p>
@@ -22,7 +22,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($appointments as $cita)
-                        <tr class="hover:bg-gray-50/50 transition">
+                        <tr class="hover:bg-gray-50/50 transition duration-150">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-bold text-moto-black">#{{ $cita->id }}</div>
                                 <div class="text-sm text-gray-500">{{ $cita->scheduled_at->format('d/m/Y H:i') }}</div>
@@ -62,19 +62,22 @@
                                 <x-badge :color="$color" :label="$label" />
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button wire:click="edit({{ $cita->id }})" class="text-indigo-600 hover:text-indigo-900 mr-3" title="Editar">
-                                    <i class="fas fa-edit"></i>
+                                <button wire:click="edit({{ $cita->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3" title="Editar">
+                                    <i class="fas fa-edit text-lg"></i>
                                 </button>
                                 <button wire:click="delete({{ $cita->id }})"
-                                    onclick="confirm('¿Cancelar esta cita?') || event.stopImmediatePropagation()"
-                                    class="text-red-600 hover:text-red-900" title="Cancelar">
-                                    <i class="fas fa-ban"></i>
+                                    onclick="confirm('¿Estás seguro(a) Cancelar esta cita?') || event.stopImmediatePropagation()"
+                                    class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
+                                    <i class="fas fa-ban text-lg"></i>
                                 </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-10 text-center text-gray-500">No hay citas registradas.</td>
+                            <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                                <i class="fas fa-users-slash text-4xl mb-3 text-gray-300"></i>
+                                <p>No hay citas registrados aún.</p>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -152,8 +155,11 @@
 @script
 <script>
     Livewire.on('show-appointment-modal-changed', ([value]) => {
-        if (value) { $dispatch('open-modal', 'appointment-manager-modal'); }
-        else { $dispatch('close-modal'); }
+        if (value) {
+            $dispatch('open-modal', 'appointment-manager-modal');
+        } else {
+            $dispatch('close-modal');
+        }
     });
 </script>
 @endscript

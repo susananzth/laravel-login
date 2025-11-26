@@ -72,7 +72,7 @@
                                     <i class="fas fa-edit text-lg"></i>
                                 </button>
                                 <button wire:click="delete({{ $user->id }})"
-                                        onclick="confirm('¿Estás seguro de eliminar este usuario? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
+                                        onclick="confirm('¿Estás seguro(a) de eliminar este usuario? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
                                         class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
                                     <i class="fas fa-trash-alt text-lg"></i>
                                 </button>
