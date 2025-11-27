@@ -32,7 +32,11 @@
                     },
                     editable: {{ Auth::user()->hasRole('technician') ? 'false' : 'true' }}, // Técnico no edita
                     eventDrop: (info) => {
-                        // Al soltar el evento, actualizamos en backend
+                        if (!confirm('Estás cambiando la fecha de la cita. Esto enviará un correo inmediato al cliente. ¿Confirmar cambio?')) {
+                            info.revert(); // Si dice que NO, devolvemos la cita a su lugar
+                            return;
+                        }
+                        // Si dice que SÍ, actualizamos en backend
                         @this.updateAppointmentDate(info.event.id, info.event.startStr);
                     },
                     eventClick: (info) => {

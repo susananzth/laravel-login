@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Admin;
 
+use App\Mail\AppointmentNotification;
 use App\Models\Appointment;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -60,16 +62,36 @@ class ManageAppointments extends Component
 
         $cita = Appointment::findOrFail($this->appointmentId);
 
-        $cita->update([
+        // 1. Llenamos los datos PERO NO GUARDAMOS AÚN
+        $cita->fill([
             'scheduled_at' => Carbon::parse($this->date . ' ' . $this->time),
             'technician_id' => $this->technician_id ?: null,
             'status' => $this->status,
             'notes' => $this->notes,
         ]);
 
+        // 2. Detectamos si cambió algo importante para el cliente
+        $shouldNotify = $cita->isDirty(['scheduled_at', 'status']);
+
+        // Detectamos si es cancelación para cambiar el asunto del correo
+        $type = ($this->status === 'cancelled') ? 'cancelled' : 'updated';
+
+        // 3. Guardamos
+        $cita->save();
+
+        // 4. Enviamos correo SOLO si hubo cambios relevantes
+        if ($shouldNotify) {
+            Mail::to($cita->client->email)->send(new AppointmentNotification($cita, $type));
+        }
+
         $this->showModal = false;
         $this->dispatch('close-modal');
-        $this->dispatch('notify', 'Cita actualizada correctamente');
+        // Mensaje diferente si se notificó
+        $msg = $shouldNotify
+            ? 'Cita actualizada y cliente notificado por correo.'
+            : 'Cita actualizada correctamente.';
+
+        $this->dispatch('notify', $msg);
     }
 
     public function delete($id)
@@ -78,7 +100,9 @@ class ManageAppointments extends Component
         $cita->status = 'cancelled';
         $cita->save();
 
-        // FALTA $this->dispatch('notify', 'Cita cancelada');
+        Mail::to($cita->client->email)->send(new AppointmentNotification($cita, 'cancelled'));
+
+        $this->dispatch('notify', 'Cita cancelada y cliente notificado por correo.');
     }
 
     public function render()

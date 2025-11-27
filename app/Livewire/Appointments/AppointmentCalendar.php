@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Appointments;
 
+use App\Mail\AppointmentNotification;
 use App\Models\Appointment;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -124,8 +126,12 @@ class AppointmentCalendar extends Component
             return;
         }
 
-        $cita->update(['scheduled_at' => Carbon::parse($newDate)]);
-        $this->dispatch('notify', 'Cita reprogramada con éxito.');
+        $cita->scheduled_at = Carbon::parse($newDate);
+        $cita->save();
+
+        Mail::to($cita->client->email)->send(new AppointmentNotification($cita, 'updated'));
+
+        $this->dispatch('notify', 'Cita reprogramada y correo enviado al cliente.');
     }
 
     public function render()

@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Booking;
 
-use Livewire\Component;
+use App\Mail\AppointmentNotification;
 use App\Models\Service;
 use App\Models\Appointment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Livewire\Component;
 
 class CreateAppointment extends Component
 {
@@ -62,13 +64,15 @@ class CreateAppointment extends Component
             'time' => 'required',
         ]);
 
-        Appointment::create([
+        $cita = Appointment::create([
             'user_id' => Auth::id(),
             'service_id' => $this->service_id,
             'scheduled_at' => Carbon::parse($this->date . ' ' . $this->time),
             'status' => 'pending',
             'notes' => $this->notes
         ]);
+
+        Mail::to(Auth::user()->email)->send(new AppointmentNotification($cita, 'created'));
 
         session()->flash('message', '¡Cita agendada con éxito!');
         return redirect()->route('dashboard');
