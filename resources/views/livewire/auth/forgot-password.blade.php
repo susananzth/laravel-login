@@ -1,25 +1,36 @@
- <div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Forgot password')" :description="__('Enter your email to receive a password reset link')" />
+<div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-md w-full mx-auto">
+    <div class="mb-6 text-center">
+        <h2 class="text-2xl font-bold text-moto-black mb-2">{{ __('Recuperar Contraseña') }}</h2>
+        <p class="text-sm text-gray-600">
+            {{ __('Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.') }}
+        </p>
+    </div>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+    <x-auth-session-status class="mb-4 text-center" :status="session('status')" />
 
-    <form method="POST" wire:submit="sendPasswordResetLink" class="flex flex-col gap-6">
-        <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email Address')"
+    <form wire:submit="sendPasswordResetLink" class="space-y-6">
+        <x-forms.input
+            name="email"
+            wireModel="email"
+            :label="__('Correo electrónico')"
             type="email"
             required
             autofocus
-            placeholder="email@example.com"
+            placeholder="tu@email.com"
+            icon="fas fa-envelope"
         />
 
-        <flux:button variant="primary" type="submit" class="w-full">{{ __('Email password reset link') }}</flux:button>
+        <x-button variant="primary" type="submit" class="w-full">
+            {{ __('Enviar enlace de recuperación') }}
+        </x-button>
     </form>
 
-    <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-400">
-        <span>{{ __('Or, return to') }}</span>
-        <flux:link :href="route('login')" wire:navigate>{{ __('log in') }}</flux:link>
+    <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">
+            {{ __('¿Lo recordaste?') }}
+            <a href="{{ route('login') }}" class="text-moto-red hover:text-red-700 font-medium transition duration-150" wire:navigate>
+                {{ __('Volver al inicio de sesión') }}
+            </a>
+        </p>
     </div>
 </div>
