@@ -6,7 +6,8 @@
 
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
             <span class="inline-block py-1 px-3 rounded-full bg-moto-red/20 border border-moto-red/30 text-moto-red text-sm font-bold mb-6 uppercase tracking-wider animate-pulse">
-                🚀 Servicio Premium Disponible
+                <i class="fas fa-rocket text-blue-500 me-1"></i>
+                Servicio Premium Disponible
             </span>
             <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight tracking-tight">
                 Tu Moto Merece <br class="hidden md:block" />

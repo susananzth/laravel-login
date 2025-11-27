@@ -72,10 +72,10 @@ class Reports extends Component
             ->get();
 
         return view('livewire.admin.reports', [
-            'incomeLabels' => $incomeData->pluck('date'),
-            'incomeValues' => $incomeData->pluck('total'),
-            'serviceLabels' => $popularServices->pluck('name'),
-            'serviceValues' => $popularServices->pluck('total'),
+            'incomeLabels' => $incomeData->pluck('date')->values()->toArray(),
+            'incomeValues' => $incomeData->pluck('total')->values()->toArray(),
+            'serviceLabels' => $popularServices->pluck('name')->values()->toArray(),
+            'serviceValues' => $popularServices->pluck('total')->values()->toArray(),
             'statusData' => $statusCounts,
         ]);
     }
