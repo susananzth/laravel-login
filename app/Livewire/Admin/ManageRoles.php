@@ -34,6 +34,8 @@ class ManageRoles extends Component
 
     public function create()
     {
+        abort_unless(auth()->user()->can('roles.create'), 403);
+
         $this->reset(['name', 'roleId', 'selectedPermissions']);
         $this->resetErrorBag();
         $this->showModal = true;
@@ -42,6 +44,8 @@ class ManageRoles extends Component
 
     public function edit($id)
     {
+        abort_unless(auth()->user()->canany('roles.view', 'roles.edit'), 403);
+
         $role = Role::findOrFail($id);
 
         $this->isSystemRole = in_array($role->name, ['admin', 'client', 'technician']);
@@ -58,6 +62,8 @@ class ManageRoles extends Component
 
     public function save()
     {
+        abort_unless(auth()->user()->canany('roles.create', 'roles.edit'), 403);
+
         $rules = [
             'selectedPermissions' => 'array'
         ];
@@ -98,6 +104,8 @@ class ManageRoles extends Component
 
     public function delete($id)
     {
+        abort_unless(auth()->user()->can('roles.delete'), 403);
+
         // Proteger roles críticos
         if (in_array(Role::find($id)->name, ['admin', 'client', 'technician'])) {
             $this->dispatch('error', 'No puedes eliminar roles del sistema.');
@@ -110,6 +118,8 @@ class ManageRoles extends Component
 
     public function render()
     {
+        abort_unless(auth()->user()->can('roles.view'), 403);
+
         return view('livewire.admin.manage-roles', [
             'roles' => Role::with('permissions')->paginate(10),
             'permissions' => Permission::all()->groupBy(function($data) {

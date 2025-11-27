@@ -5,9 +5,11 @@
             <h2 class="text-2xl font-bold text-moto-black">Catálogo de Servicios</h2>
             <p class="text-gray-600 text-sm">Gestiona los servicios ofrecidos en el taller.</p>
         </div>
+        @can('services.create')
         <x-button wire:click="create" icon="fas fa-plus">
             Nuevo Servicio
         </x-button>
+        @endcan
     </div>
 
     {{-- Tabla de Servicios --}}
@@ -44,14 +46,18 @@
                                 <x-badge :color="$badgeColor" :label="$badgeName" />
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button wire:click="edit({{ $service->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3">
-                                    <i class="fas fa-edit text-lg"></i>
-                                </button>
-                                <button wire:click="delete({{ $service->id }})"
-                                    onclick="confirm('¿Estás seguro(a) de eliminar este servicio? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
-                                    class="text-gray-400 hover:text-red-600 transition duration-200">
-                                    <i class="fas fa-trash-alt text-lg"></i>
-                                </button>
+                                @canany(['services.view', 'services.edit'])
+                                    <button wire:click="edit({{ $service->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3">
+                                        <i class="fas fa-edit text-lg"></i>
+                                    </button>
+                                @endcanany
+                                @can('services.delete')
+                                    <button wire:click="delete({{ $service->id }})"
+                                        onclick="confirm('¿Estás seguro(a) de eliminar este servicio? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
+                                        class="text-gray-400 hover:text-red-600 transition duration-200">
+                                        <i class="fas fa-trash-alt text-lg"></i>
+                                    </button>
+                                @endcan
                             </td>
                         </tr>
                     @empty
@@ -70,6 +76,7 @@
         </div>
     </div>
 
+    @canany(['services.view', 'services.edit'])
     {{-- MODAL DE SERVICIOS --}}
     <x-modal name="service-manager-modal" :show="$showModal" maxWidth="md">
         <form wire:submit.prevent="save" id="serviceForm">
@@ -140,6 +147,7 @@
             </x-slot>
         </form>
     </x-modal>
+    @endcanany
 </div>
 
 @script

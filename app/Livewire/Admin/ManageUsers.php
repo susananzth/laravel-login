@@ -46,12 +46,17 @@ class ManageUsers extends Component
 
     public function create()
     {
+        abort_unless(auth()->user()->can('users.create'), 403);
+
         $this->resetInputFields();
         $this->showModal = true;
         $this->dispatch('open-modal', 'user-manager-modal');
     }
 
-    public function save() {
+    public function save()
+    {
+        abort_unless(auth()->user()->canany('users.create', 'users.edit'), 403);
+
         $this->validate($this->rules());
 
         $data = [
@@ -85,6 +90,8 @@ class ManageUsers extends Component
 
     public function edit($id)
     {
+        abort_unless(auth()->user()->canany('users.view', 'users.edit'), 403);
+
         $user = User::findOrFail($id);
         $this->userId = $id;
         $this->firstname = $user->firstname;
@@ -103,6 +110,8 @@ class ManageUsers extends Component
 
     public function delete($id)
     {
+        abort_unless(auth()->user()->can('users.delete'), 403);
+
         if($id) {
             // Evitar auto-eliminación
             if($id === auth()->id()) {
@@ -121,6 +130,8 @@ class ManageUsers extends Component
 
     public function render()
     {
+        abort_unless(auth()->user()->can('users.view'), 403);
+
         return view('livewire.admin.manage-users', [
             'users' => User::with('roles')->latest()->paginate(10),
             'availableRoles' => Role::all(),

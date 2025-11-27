@@ -5,9 +5,11 @@
             <h2 class="text-2xl font-bold text-moto-black">Gestión de Usuarios</h2>
             <p class="text-gray-600 text-sm">Administra el acceso y roles del personal y clientes.</p>
         </div>
+        @can('users.create')
         <x-button wire:click="create" icon="fas fa-plus">
             Nuevo Usuario
         </x-button>
+        @endcan
     </div>
 
     {{-- Tabla de Usuarios --}}
@@ -61,14 +63,18 @@
 
                             {{-- Columna Acciones --}}
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button wire:click="edit({{ $user->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3" title="Editar">
-                                    <i class="fas fa-edit text-lg"></i>
-                                </button>
-                                <button wire:click="delete({{ $user->id }})"
-                                        onclick="confirm('¿Estás seguro(a) de eliminar este usuario? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
-                                        class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
-                                    <i class="fas fa-trash-alt text-lg"></i>
-                                </button>
+                                @canany(['users.view', 'users.edit'])
+                                    <button wire:click="edit({{ $user->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3" title="Editar">
+                                        <i class="fas fa-edit text-lg"></i>
+                                    </button>
+                                @endcanany
+                                @can('users.delete')
+                                    <button wire:click="delete({{ $user->id }})"
+                                            onclick="confirm('¿Estás seguro(a) de eliminar este usuario? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
+                                            class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
+                                        <i class="fas fa-trash-alt text-lg"></i>
+                                    </button>
+                                @endcan
                             </td>
                         </tr>
                     @empty
@@ -89,6 +95,7 @@
         </div>
     </div>
 
+    @canany(['users.view', 'users.edit'])
     {{-- MODAL DE CREACIÓN / EDICIÓN --}}
     <x-modal name="user-manager-modal" :show="$showModal" maxWidth="md">
         <form wire:submit.prevent="save" id="userForm">
@@ -210,6 +217,7 @@
 
         </form>
     </x-modal>
+    @endcanany
 </div>
 
 {{-- Script para sincronizar el modal con Alpine --}}

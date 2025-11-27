@@ -41,6 +41,8 @@ class ManageAppointments extends Component
 
     public function edit($id)
     {
+        abort_unless(auth()->user()->can('appointments.edit'), 403);
+
         $cita = Appointment::with(['client', 'service'])->findOrFail($id);
 
         $this->appointmentId = $id;
@@ -58,6 +60,8 @@ class ManageAppointments extends Component
 
     public function save()
     {
+        abort_unless(auth()->user()->can('appointments.edit'), 403);
+
         $this->validate();
 
         $cita = Appointment::findOrFail($this->appointmentId);
@@ -96,17 +100,21 @@ class ManageAppointments extends Component
 
     public function delete($id)
     {
+        abort_unless(auth()->user()->can('appointments.cancel'), 403);
+
         $cita = Appointment::find($id);
         $cita->status = 'cancelled';
         $cita->save();
 
         Mail::to($cita->client->email)->send(new AppointmentNotification($cita, 'cancelled'));
 
-        $this->dispatch('notify', 'Cita cancelada y cliente notificado por correo.');
+        $this->dispatch('notify', 'Cita cancelada y notificada por correo.');
     }
 
     public function render()
     {
+        abort_unless(auth()->user()->canany('appointments.view_all', 'appointments.view_own'), 403);
+
         $appointments = Appointment::with(['client', 'service', 'technician'])
             ->latest('scheduled_at')
             ->paginate(10);

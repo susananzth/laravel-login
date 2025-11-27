@@ -13,9 +13,16 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">ID / Fecha</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">
+                            @canany(['appointments.view_all', 'appointments.be_assigned'])
+                                <span class="me-1">ID /</span>
+                            @endcanany
+                            Fecha
+                        </th>
                         <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">Cliente / Servicio</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">Técnico</th>
+                        @canany(['appointments.view_all', 'appointments.be_assigned'])
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">Técnico</th>
+                        @endcanany
                         <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">Estado</th>
                         <th class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase">Acciones</th>
                     </tr>
@@ -24,22 +31,26 @@
                     @forelse($appointments as $cita)
                         <tr class="hover:bg-gray-50/50 transition duration-150">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-bold text-moto-black">#{{ $cita->id }}</div>
+                                @canany(['appointments.view_all', 'appointments.be_assigned'])
+                                    <div class="text-sm font-bold text-moto-black">#{{ $cita->id }}</div>
+                                @endcanany
                                 <div class="text-sm text-gray-500">{{ $cita->scheduled_at->format('d/m/Y H:i') }}</div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm font-medium text-gray-900">{{ $cita->client->firstname . ' ' . $cita->client->lastname }}</div>
                                 <div class="text-xs text-gray-500 bg-gray-100 inline-block px-2 py-0.5 rounded">{{ $cita->service->name }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                @if($cita->technician)
-                                    <span class="flex items-center text-blue-600 font-medium">
-                                        <i class="fas fa-wrench text-xs mr-1"></i> {{ $cita->technician->firstname . ' ' . $cita->technician->lastname }}
-                                    </span>
-                                @else
-                                    <span class="text-gray-400 italic">-- Sin asignar --</span>
-                                @endif
-                            </td>
+                            @canany(['appointments.view_all', 'appointments.be_assigned'])
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    @if($cita->technician)
+                                        <span class="flex items-center text-blue-600 font-medium">
+                                            <i class="fas fa-wrench text-xs mr-1"></i> {{ $cita->technician->firstname . ' ' . $cita->technician->lastname }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400 italic">-- Sin asignar --</span>
+                                    @endif
+                                </td>
+                            @endcanany
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
                                     $color = match($cita->status) {
@@ -54,19 +65,27 @@
                                 <x-badge :color="$color" :label="__( $label )" />
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                @can('appointments.edit')
                                 <button wire:click="edit({{ $cita->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3" title="Editar">
                                     <i class="fas fa-edit text-lg"></i>
                                 </button>
+                                @endcan
+                                @can('appointments.cancel')
                                 <button wire:click="delete({{ $cita->id }})"
                                     onclick="confirm('¿Estás seguro(a) Cancelar esta cita?') || event.stopImmediatePropagation()"
                                     class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
                                     <i class="fas fa-ban text-lg"></i>
                                 </button>
+                                @endcan
                             </td>
                         </tr>
                     @empty
                         <tr>
+                            @canany(['appointments.view_all', 'appointments.be_assigned'])
                             <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                            @else
+                            <td colspan="4" class="px-6 py-10 text-center text-gray-500">
+                            @endcanany
                                 <i class="fas fa-box-open text-4xl mb-3 text-gray-300"></i>
                                 <p>No hay citas registrados aún.</p>
                             </td>
@@ -79,7 +98,7 @@
             {{ $appointments->links() }}
         </div>
     </div>
-
+    @can('appointments.edit')
     {{-- MODAL DE EDICIÓN --}}
     <x-modal name="appointment-manager-modal" :show="$showModal" maxWidth="lg">
         <form wire:submit.prevent="save" id="appointmentForm">
@@ -136,12 +155,19 @@
                 <x-button type="button" variant="secondary" wire:click="$set('showModal', false)">
                     Cancelar
                 </x-button>
-                <x-button type="submit" variant="primary" class="ml-3" form="appointmentForm">
+                <x-button
+                    type="submit"
+                    variant="primary"
+                    class="ml-3"
+                    form="appointmentForm"
+                    wire:confirm="Atención: Al guardar cambios en la FECHA o ESTADO, se enviará un correo automático al cliente notificándole el cambio. ¿Deseas continuar?"
+                >
                     Actualizar
                 </x-button>
             </x-slot>
         </form>
     </x-modal>
+    @endcan
 </div>
 
 @script

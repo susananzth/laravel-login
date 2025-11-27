@@ -33,12 +33,13 @@ class AppointmentCalendar extends Component
         $query = Appointment::with(['client', 'service', 'technician']);
         $query->whereBetween('scheduled_at', [now()->startOfYear(), now()->endOfYear()]);
 
-        if ($user->can('appointments.be_assigned')) {
+        if ($user->can('appointments.view_all')) {
+            // No filtramos nada, ve todo.
+        } elseif ($user->can('appointments.be_assigned')) {
             $query->where('technician_id', $user->id);
         } else {
             $query->where('user_id', $user->id);
         }
-        // Si es Admin, ve todo (no entra en los if anteriores)
 
         return $query->get()->map(function ($cita) use ($user) {
             // Colores según estado

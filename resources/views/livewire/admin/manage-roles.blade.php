@@ -5,9 +5,11 @@
             <h2 class="text-2xl font-bold text-moto-black">Roles y Permisos</h2>
             <p class="text-gray-600 text-sm">Define qué pueden hacer los usuarios en el sistema.</p>
         </div>
+        @can('roles.create')
         <x-button wire:click="create" icon="fas fa-plus">
             Nuevo Rol
         </x-button>
+        @endcan
     </div>
 
     {{-- Tabla de Roles --}}
@@ -33,16 +35,20 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button wire:click="edit({{ $role->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3" title="Editar">
-                                    <i class="fas fa-edit text-lg"></i>
-                                </button>
-                                @unless(in_array($role->name, ['admin', 'client', 'technician']))
-                                    <button wire:click="delete({{ $role->id }})"
-                                        onclick="confirm('¿Estás seguro(a) de eliminar este rol? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
-                                            class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
-                                        <i class="fas fa-trash text-lg"></i>
+                                @canany(['roles.view', 'roles.edit'])
+                                    <button wire:click="edit({{ $role->id }})" class="text-gray-400 hover:text-moto-red transition duration-200 mr-3" title="Editar">
+                                        <i class="fas fa-edit text-lg"></i>
                                     </button>
-                                @endunless
+                                @endcanany
+                                @can('roles.delete')
+                                    @unless(in_array($role->name, ['admin', 'client', 'technician']))
+                                        <button wire:click="delete({{ $role->id }})"
+                                            onclick="confirm('¿Estás seguro(a) de eliminar este rol? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
+                                                class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
+                                            <i class="fas fa-trash text-lg"></i>
+                                        </button>
+                                    @endunless
+                                @endcan
                             </td>
                         </tr>
                     @empty
@@ -57,7 +63,7 @@
             </table>
         </div>
     </div>
-
+    @canany(['roles.view', 'roles.edit'])
     {{-- MODAL DE ROLES --}}
     <x-modal name="role-manager-modal" :show="$showModal" maxWidth="2xl">
         <form wire:submit.prevent="save" id="roleForm">
@@ -124,6 +130,7 @@
             </x-slot>
         </form>
     </x-modal>
+    @endcanany
 </div>
 
 @script

@@ -2,7 +2,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
-            @role('admin')
+            @canany(['appointments.view_all', 'appointments.be_assigned'])
                 <h2 class="text-3xl font-extrabold text-moto-black border-b pb-2 mb-6">
                     <i class="fas fa-gear text-gray-500 me-1"></i>
                     Panel de Administración
@@ -37,7 +37,7 @@
                         </div>
                     </div>
                 </div>
-            @endrole
+            @endcanany
 
             {{-- Sección de Calendario --}}
             <div class="p-6 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
@@ -47,7 +47,7 @@
                 <livewire:appointments.appointment-calendar />
             </div>
 
-            @role('client')
+            @can('appointments.create')
                 {{-- Sección de Acción para Clientes --}}
                 <div class="bg-moto-red/10 overflow-hidden shadow-lg sm:rounded-2xl p-8 mt-8 border border-moto-red/30">
                     <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
@@ -60,8 +60,7 @@
                         </x-button>
                     </div>
                 </div>
-            @endrole
-
+            @endcan
         </div>
     </div>
 </x-layouts.app>
