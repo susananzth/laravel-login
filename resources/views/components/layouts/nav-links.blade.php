@@ -47,6 +47,16 @@
     </a>
 </li>
 @endcan
+@can('reports.view')
+<li>
+    <a href="{{ route('admin.reports') }}" wire:navigate
+       class="{{ request()->routeIs('admin.reports') ? 'bg-moto-red text-white shadow-lg shadow-red-900/20' : 'text-gray-400 hover:text-white hover:bg-zinc-800' }}
+              group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition duration-200">
+        <i class="fas fa-chart-area shrink-0 w-6 text-center {{ request()->routeIs('admin.reports') ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"></i>
+        Reportes
+    </a>
+</li>
+@endcan
 @can('appointments.create')
 <li>
     <a href="{{ route('appointments.create') }}" wire:navigate

@@ -8,6 +8,7 @@ use App\Livewire\Admin\ManageAppointments;
 use App\Livewire\Admin\ManageRoles;
 use App\Livewire\Admin\ManageServices;
 use App\Livewire\Admin\ManageUsers;
+use App\Livewire\Admin\Reports;
 use App\Models\Appointment;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/services', ManageServices::class)->name('admin.services');
     Route::get('/admin/roles', ManageRoles::class)->name('admin.roles');
     Route::get('/admin/users', ManageUsers::class)->name('admin.users');
+    Route::get('/admin/reports', Reports::class)->name('admin.reports');
 });
 
 Route::get('/test-403', function () { abort(403); });

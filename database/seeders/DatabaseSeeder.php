@@ -35,6 +35,8 @@ class DatabaseSeeder extends Seeder
             'appointments.cancel',
             'appointments.assign',   // Asignar técnico
             'appointments.complete', // Finalizar trabajo
+            // Reportes
+            'reports.view',
         ];
 
         foreach ($permissions as $permission) {
@@ -61,8 +63,7 @@ class DatabaseSeeder extends Seeder
         $roleClient->givePermissionTo([
             'appointments.view_own',
             'appointments.create',
-            'appointments.cancel',
-            'services.view'
+            'appointments.cancel'
         ]);
 
         // 3. Usuarios

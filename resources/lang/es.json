@@ -18,6 +18,7 @@
     "appointments.cancel": "Cancelar Citas",
     "appointments.assign": "Asignar Técnicos",
     "appointments.complete": "Completar Servicio",
+    "reports.view": "Ver Reportes",
     "pending" : "Pendiente",
     "confirmed" : "Confirmada",
     "in_progress" : "En Taller",
