@@ -47,7 +47,7 @@
             <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
                 @foreach($statusData as $stat)
                     <div class="text-center p-3 bg-gray-50 rounded-lg">
-                        <div class="text-xs uppercase text-gray-500 font-bold">{{ $stat->status }}</div>
+                        <div class="text-xs uppercase text-gray-500 font-bold">{{ __($stat->status) }}</div>
                         <div class="text-xl font-black text-moto-black">{{ $stat->total }}</div>
                     </div>
                 @endforeach

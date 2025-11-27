@@ -62,7 +62,7 @@
                                         default => 'gray'
                                     };
                                 @endphp
-                                <x-badge :color="$color" :label="__( $label )" />
+                                <x-badge :color="$color" :label="__( $cita->status )" />
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 @can('appointments.edit')
