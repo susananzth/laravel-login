@@ -46,13 +46,13 @@
                                 @foreach($user->roles as $role)
                                     @php
                                         $badgeColor = match($role->name) {
-                                            'admin' => 'purple',
-                                            'technician' => 'blue',
-                                            'client' => 'green',
+                                            'Administrador' => 'purple',
+                                            'Ténico' => 'blue',
+                                            'Cliente' => 'green',
                                             default => 'gray'
                                         };
                                     @endphp
-                                    <x-badge :color="__( $role->name )" :label="$roleName" />
+                                    <x-badge :color="$badgeColor" :label="__( $role->name )" />
                                 @endforeach
                             </td>
 

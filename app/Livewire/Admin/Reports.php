@@ -46,7 +46,7 @@ class Reports extends Component
 
     public function render()
     {
-        abort_unless(auth()->user()->can('reports.view'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('reports.view'), 403);
 
         // 1. Ingresos por Mes (Line Chart)
         // Agrupamos por fecha

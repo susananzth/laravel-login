@@ -30,9 +30,9 @@
                             successCallback(events);
                         });
                     },
-                    editable: {{ Auth::user()->hasRole('technician') ? 'false' : 'true' }}, // Técnico no edita
+                    editable: {{ Auth::user()->hasAnyPermission(['appointments.edit', 'appointments.be_assigned', 'appointments.assign', 'appointments.complete']) ? 'false' : 'true' }},
                     eventDrop: (info) => {
-                        if (!confirm('Estás cambiando la fecha de la cita. Esto enviará un correo inmediato al cliente. ¿Confirmar cambio?')) {
+                        if (!confirm('Estás cambiando la fecha de la cita. ¿Confirmar cambio?')) {
                             info.revert(); // Si dice que NO, devolvemos la cita a su lugar
                             return;
                         }
@@ -56,8 +56,8 @@
         <div x-ref="calendar"></div>
     </div>
 
-    {{-- MODAL DE GESTIÓN DE CITA (Solo Admin) --}}
-    @role('admin')
+    {{-- MODAL DE GESTIÓN DE CITA --}}
+    @canany(['appointments.be_assigned', 'appointments.assign', 'appointments.complete'])
         {{-- Usamos x-modal y Livewire para controlar la visibilidad con 'showModal' --}}
         <x-modal name="admin-appointment-manager" :show="$showModal" maxWidth="lg">
 
@@ -143,7 +143,7 @@
 
             </form>
         </x-modal>
-    @endrole
+    @endcanany
 
 </div>
 

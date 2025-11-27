@@ -39,7 +39,7 @@ class Register extends Component
 
         event(new Registered(($user = User::create($validated))));
 
-        $user->assignRole('client');
+        $user->assignRole('Cliente');
 
         Auth::login($user);
 

@@ -46,7 +46,7 @@ class ManageUsers extends Component
 
     public function create()
     {
-        abort_unless(auth()->user()->can('users.create'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('users.create'), 403);
 
         $this->resetInputFields();
         $this->showModal = true;
@@ -55,7 +55,7 @@ class ManageUsers extends Component
 
     public function save()
     {
-        abort_unless(auth()->user()->canany('users.create', 'users.edit'), 403);
+        abort_unless(auth()->user()->hasAnyPermission(['users.create', 'users.edit']), 403);
 
         $this->validate($this->rules());
 
@@ -90,7 +90,7 @@ class ManageUsers extends Component
 
     public function edit($id)
     {
-        abort_unless(auth()->user()->canany('users.view', 'users.edit'), 403);
+        abort_unless(auth()->user()->hasAnyPermission(['users.view', 'users.edit']), 403);
 
         $user = User::findOrFail($id);
         $this->userId = $id;
@@ -110,7 +110,7 @@ class ManageUsers extends Component
 
     public function delete($id)
     {
-        abort_unless(auth()->user()->can('users.delete'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('users.delete'), 403);
 
         if($id) {
             // Evitar auto-eliminación
@@ -130,7 +130,7 @@ class ManageUsers extends Component
 
     public function render()
     {
-        abort_unless(auth()->user()->can('users.view'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('users.view'), 403);
 
         return view('livewire.admin.manage-users', [
             'users' => User::with('roles')->latest()->paginate(10),

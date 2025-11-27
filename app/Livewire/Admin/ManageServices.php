@@ -34,7 +34,7 @@ class ManageServices extends Component
 
     public function create()
     {
-        abort_unless(auth()->user()->can('services.create'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('services.create'), 403);
 
         $this->resetInputFields();
         $this->showModal = true;
@@ -43,7 +43,7 @@ class ManageServices extends Component
 
     public function edit($id)
     {
-        abort_unless(auth()->user()->canany('services.view', 'services.edit'), 403);
+        abort_unless(auth()->user()->hasAnyPermission(['services.view', 'services.edit']), 403);
 
         $service = Service::findOrFail($id);
         $this->serviceId = $id;
@@ -60,7 +60,7 @@ class ManageServices extends Component
 
     public function save()
     {
-        abort_unless(auth()->user()->canany('services.create', 'services.edit'), 403);
+        abort_unless(auth()->user()->hasAnyPermission(['services.create', 'services.edit']), 403);
 
         $this->validate($this->rules());
 
@@ -80,7 +80,7 @@ class ManageServices extends Component
 
     public function delete($id)
     {
-        abort_unless(auth()->user()->can('services.delete'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('services.delete'), 403);
 
         if (Service::find($id)->appointments()->exists()) {
             $this->dispatch('error', 'No puedes eliminar porque tiene citas asociadas.');
@@ -101,7 +101,7 @@ class ManageServices extends Component
 
     public function render()
     {
-        abort_unless(auth()->user()->can('services.view'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('services.view'), 403);
 
         return view('livewire.admin.manage-services', [
             'services' => Service::latest()->paginate(10),

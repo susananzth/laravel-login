@@ -46,23 +46,25 @@ class DatabaseSeeder extends Seeder
         // 2. Roles y Asignación
 
         // ADMIN: Todo (Superpoder)
-        $roleAdmin = Role::create(['name' => 'admin']);
+        $roleAdmin = Role::create(['name' => 'Administrador']);
         $roleAdmin->givePermissionTo(Permission::all());
 
         // TÉCNICO
-        $roleTech = Role::create(['name' => 'technician']);
+        $roleTech = Role::create(['name' => 'Ténico']);
         $roleTech->givePermissionTo([
             'appointments.view_own',
             'appointments.be_assigned',
+            'appointments.edit',
             'appointments.complete',
             'services.view' // Para ver el catálogo
         ]);
 
         // CLIENTE
-        $roleClient = Role::create(['name' => 'client']);
+        $roleClient = Role::create(['name' => 'Cliente']);
         $roleClient->givePermissionTo([
             'appointments.view_own',
             'appointments.create',
+            'appointments.edit',
             'appointments.cancel'
         ]);
 

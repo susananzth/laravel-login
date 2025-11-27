@@ -41,7 +41,7 @@ class ManageAppointments extends Component
 
     public function edit($id)
     {
-        abort_unless(auth()->user()->can('appointments.edit'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('appointments.edit'), 403);
 
         $cita = Appointment::with(['client', 'service'])->findOrFail($id);
 
@@ -60,7 +60,7 @@ class ManageAppointments extends Component
 
     public function save()
     {
-        abort_unless(auth()->user()->can('appointments.edit'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('appointments.edit'), 403);
 
         $this->validate();
 
@@ -100,7 +100,7 @@ class ManageAppointments extends Component
 
     public function delete($id)
     {
-        abort_unless(auth()->user()->can('appointments.cancel'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('appointments.cancel'), 403);
 
         $cita = Appointment::find($id);
         $cita->status = 'cancelled';
@@ -113,7 +113,7 @@ class ManageAppointments extends Component
 
     public function render()
     {
-        abort_unless(auth()->user()->canany('appointments.view_all', 'appointments.view_own'), 403);
+        abort_unless(auth()->user()->hasAnyPermission(['appointments.view_all', 'appointments.view_own']), 403);
 
         $appointments = Appointment::with(['client', 'service', 'technician'])
             ->latest('scheduled_at')

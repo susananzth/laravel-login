@@ -13,4 +13,8 @@ class Service extends Model
         'duration_minutes',
         'is_active',
     ];
+
+    public function appointments() {
+        return $this->hasMany(Appointment::class);
+    }
 }

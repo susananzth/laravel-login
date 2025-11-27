@@ -41,7 +41,7 @@
                                     </button>
                                 @endcanany
                                 @can('roles.delete')
-                                    @unless(in_array($role->name, ['admin', 'client', 'technician']))
+                                    @unless(in_array($role->id, [1, 2, 3]))
                                         <button wire:click="delete({{ $role->id }})"
                                             onclick="confirm('¿Estás seguro(a) de eliminar este rol? Esta acción no se puede deshacer.') || event.stopImmediatePropagation()"
                                                 class="text-gray-400 hover:text-red-600 transition duration-200" title="Eliminar">
@@ -84,13 +84,13 @@
                     wireModel="name"
                     placeholder="Ej: supervisor"
                     required
-                    {{-- Si es rol de sistema (admin/client/technician), lo deshabilitamos visualmente --}}
-                    :disabled="in_array($name, ['admin', 'client', 'technician']) && $roleId"
-                    class="{{ in_array($name, ['admin', 'client', 'technician']) && $roleId ? 'bg-gray-100 cursor-not-allowed' : '' }}"
+                    {{-- Si es rol de sistema, lo deshabilitamos visualmente --}}
+                    :disabled="$isSystemRole && $roleId"
+                    class="{{ $isSystemRole && $roleId ? 'bg-gray-100 cursor-not-allowed' : '' }}"
                 />
-                @if(in_array($name, ['admin', 'client', 'technician']) && $roleId)
+                @if($isSystemRole && $roleId)
                     <p class="text-xs text-yellow-600 mt-1">
-                        <i class="fas fa-lock mr-1"></i> Este es un rol del sistema, no se puede renombrar.
+                        <i class="fas fa-lock mr-1"></i> Este es un rol del sistema, no se puede editar.
                     </p>
                 @endif
 
@@ -103,14 +103,20 @@
                                 <h5 class="font-bold text-moto-red capitalize mb-3">{{ $group }}</h5>
                                 <div class="space-y-2">
                                     @foreach($perms as $perm)
-                                        <div class="flex items-center">
-                                            <x-checkbox
-                                                wireModel="selectedPermissions"
-                                                name="selectedPermissions[]"
-                                                value="{{ $perm->name }}"
-                                                checkboxId="perm_{{ $perm->id }}"
-                                                label="{{ __($perm->name) }}"
-                                            />
+                                        <div class="flex items-start space-x-3" wire:key="perm-{{ $perm->id }}">
+                                            <div class="flex items-center h-5 mt-0.5">
+                                                <input
+                                                    id="perm_{{ $perm->id }}"
+                                                    type="checkbox"
+                                                    wire:model="selectedPermissions"
+                                                    value="{{ $perm->name }}"
+                                                    {{ ($isSystemRole && $roleId) ? 'disabled' : '' }}
+                                                    class="{{ $isSystemRole && $roleId ? 'bg-gray-100 cursor-not-allowed' : 'bg-white' }} w-4 h-4 text-moto-red border-gray-300 rounded focus:ring-moto-red focus:ring-2 transition duration-200"
+                                                >
+                                            </div>
+                                            <label for="perm_{{ $perm->id }}" class="text-sm font-medium text-moto-black cursor-pointer select-none hover:text-gray-700 transition duration-200">
+                                                {{ __(ucfirst(str_replace(['.', '_'], ' ', explode('.', $perm->name)[1] ?? $perm->name))) }}
+                                            </label>
                                         </div>
                                     @endforeach
                                 </div>

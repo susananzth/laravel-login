@@ -33,9 +33,9 @@ class AppointmentCalendar extends Component
         $query = Appointment::with(['client', 'service', 'technician']);
         $query->whereBetween('scheduled_at', [now()->startOfYear(), now()->endOfYear()]);
 
-        if ($user->can('appointments.view_all')) {
+        if ($user->hasPermissionTo('appointments.view_all')) {
             // No filtramos nada, ve todo.
-        } elseif ($user->can('appointments.be_assigned')) {
+        } elseif ($user->hasPermissionTo('appointments.be_assigned')) {
             $query->where('technician_id', $user->id);
         } else {
             $query->where('user_id', $user->id);
@@ -51,7 +51,7 @@ class AppointmentCalendar extends Component
                 default => '#6B7280',
             };
 
-            $title = $user->hasRole('client')
+            $title = $user->hasRole('Cliente')
                 ? $cita->service->name
                 : $cita->client->firstname . ' - ' . $cita->service->name;
 
@@ -69,15 +69,12 @@ class AppointmentCalendar extends Component
         });
     }
 
-    // Guardar cambios (Asignar técnico o cambiar estado)
     public function updateAppointment()
     {
-        // Solo admin puede hacer esto (seguridad extra)
-        if (!Auth::user()->hasRole('admin')) abort(403);
+        abort_unless(auth()->user()->hasAnyPermission(['appointments.be_assigned', 'appointments.assign', 'appointments.complete']), 403);
 
         $this->validate([
             'status' => 'required',
-            // Technician puede ser null si se desasigna
         ]);
 
         $this->selectedAppointment->update([
@@ -98,6 +95,8 @@ class AppointmentCalendar extends Component
     // Cargar datos al hacer clic en el calendario
     public function editAppointment($id)
     {
+        abort_unless(auth()->user()->hasAnyPermission(['appointments.be_assigned', 'appointments.assign', 'appointments.complete']), 403);
+
         $this->selectedAppointment = Appointment::findOrFail($id);
         $this->technician_id = $this->selectedAppointment->technician_id;
         $this->status = $this->selectedAppointment->status;
@@ -116,11 +115,9 @@ class AppointmentCalendar extends Component
         $user = Auth::user();
 
         // Validaciones rápidas
-        if ($user->hasRole('client') && $cita->user_id !== $user->id) abort(403);
-        if ($user->hasRole('technician')) return; // Técnicos no mueven citas
+        if ($user->hasPermissionTo('appointments.edit') && $cita->user_id !== $user->id) abort(403);
 
-        // El cliente solo puede mover si falta más de 24hrs
-        if ($user->hasRole('client') && $cita->scheduled_at->diffInHours(now()) < 24) {
+        if ($cita->scheduled_at->diffInHours(now()) < 24) {
             $this->dispatch('error', 'No se puede reprogramar con menos de 24h de antelación.');
             $this->dispatch('refresh-calendar');
 
@@ -132,7 +129,7 @@ class AppointmentCalendar extends Component
 
         Mail::to($cita->client->email)->send(new AppointmentNotification($cita, 'updated'));
 
-        $this->dispatch('notify', 'Cita reprogramada y correo enviado al cliente.');
+        $this->dispatch('notify', 'Cita reprogramada.');
     }
 
     public function render()

@@ -12,7 +12,7 @@ class ManageRoles extends Component
     use WithPagination;
 
     public $name;
-    public $selectedPermissions = []; // Array de IDs de permisos seleccionados
+    public $selectedPermissions = []; // Array de nombres de permisos seleccionados
     public $roleId = null;
     public $isSystemRole = false;
     public $showModal = false;
@@ -34,7 +34,7 @@ class ManageRoles extends Component
 
     public function create()
     {
-        abort_unless(auth()->user()->can('roles.create'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('roles.create'), 403);
 
         $this->reset(['name', 'roleId', 'selectedPermissions']);
         $this->resetErrorBag();
@@ -44,15 +44,15 @@ class ManageRoles extends Component
 
     public function edit($id)
     {
-        abort_unless(auth()->user()->canany('roles.view', 'roles.edit'), 403);
+        abort_unless(auth()->user()->hasAnyPermission(['roles.view', 'roles.edit']), 403);
 
         $role = Role::findOrFail($id);
 
-        $this->isSystemRole = in_array($role->name, ['admin', 'client', 'technician']);
+        $this->isSystemRole = in_array($role->id, [1, 2, 3]);
 
         $this->roleId = $id;
         $this->name = $role->name;
-        // Cargar permisos actuales del rol (solo IDs)
+        // Cargar permisos actuales del rol
         $this->selectedPermissions = $role->permissions->pluck('name')->toArray();
 
         $this->resetErrorBag();
@@ -62,33 +62,19 @@ class ManageRoles extends Component
 
     public function save()
     {
-        abort_unless(auth()->user()->canany('roles.create', 'roles.edit'), 403);
+        abort_unless(auth()->user()->hasAnyPermission(['roles.create', 'roles.edit']), 403);
 
-        $rules = [
-            'selectedPermissions' => 'array'
-        ];
-
-        // Verificamos si es rol de sistema antes de guardar
-        $isSystemRole = false;
-        if ($this->roleId) {
-            $existingRole = Role::find($this->roleId);
-            $isSystemRole = in_array($existingRole->name, ['admin', 'client', 'technician']);
+        if ($this->isSystemRole) {
+            $this->dispatch('error', 'Este es un rol del sistema, no se puede editar.');
+            return;
         }
 
-        if (!$isSystemRole) {
-            $rules['name'] = 'required|min:3|unique:roles,name,' . $this->roleId;
-        }
-
-        $this->validate($rules);
+        $this->validate($this->rules());
 
         if ($this->roleId) {
             $role = Role::find($this->roleId);
-
-            // SOLO actualizamos el nombre si NO es de sistema
-            if (!$isSystemRole) {
-                $role->name = $this->name;
-                $role->save();
-            }
+            $role->name = $this->name;
+            $role->save();
         } else {
             // Crear nuevo rol
             $role = Role::create(['name' => $this->name]);
@@ -104,21 +90,23 @@ class ManageRoles extends Component
 
     public function delete($id)
     {
-        abort_unless(auth()->user()->can('roles.delete'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('roles.delete'), 403);
+
+        $role = Role::find($id);
 
         // Proteger roles críticos
-        if (in_array(Role::find($id)->name, ['admin', 'client', 'technician'])) {
+        if (in_array($role->id, [1, 2, 3])) {
             $this->dispatch('error', 'No puedes eliminar roles del sistema.');
             return;
         }
 
-        Role::find($id)->delete();
+        $role->delete();
         $this->dispatch('notify', 'Rol eliminado.');
     }
 
     public function render()
     {
-        abort_unless(auth()->user()->can('roles.view'), 403);
+        abort_unless(auth()->user()->hasPermissionTo('roles.view'), 403);
 
         return view('livewire.admin.manage-roles', [
             'roles' => Role::with('permissions')->paginate(10),

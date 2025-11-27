@@ -19,7 +19,7 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', function () {
         $stats = [];
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyPermission(['appointments.view_all', 'appointments.be_assigned'])) {
             $stats = [
                 'today' => Appointment::whereDate('scheduled_at', now())->count(),
                 'pending' => Appointment::where('status', 'pending')->count(),
