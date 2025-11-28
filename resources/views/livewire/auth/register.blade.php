@@ -87,7 +87,7 @@
         <div class="mt-6 text-center">
             <p class="text-gray-600">
                 {{ __('¿Ya tiene una cuenta?') }}
-                <a href="{{ route('login') }}" class="text-moto-red hover:text-red-700 font-medium" wire:navigate>
+                <a href="{{ route('login') }}" class="text-moto-red hover:text-red-700 font-medium">
                     {{ __('Inicie sesión') }}
                 </a>
             </p>

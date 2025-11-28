@@ -29,7 +29,7 @@
         <div class="mt-6 text-center">
             <p class="text-sm text-gray-600">
                 {{ __('¿Lo recordaste?') }}
-                <a href="{{ route('login') }}" class="text-moto-red hover:text-red-700 font-medium transition duration-150" wire:navigate>
+                <a href="{{ route('login') }}" class="text-moto-red hover:text-red-700 font-medium transition duration-150">
                     {{ __('Volver al inicio de sesión') }}
                 </a>
             </p>

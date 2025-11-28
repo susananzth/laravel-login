@@ -5,7 +5,7 @@
             <aside class="w-full md:w-64 shrink-0">
                 <ul role="list" class="space-y-1">
                     <li>
-                        <a href="{{ route('settings.profile') }}" wire:navigate
+                        <a href="{{ route('settings.profile') }}"
                             class="{{ request()->routeIs('settings.profile') ? 'bg-moto-red text-white shadow-lg shadow-red-900/20' : 'text-gray-400 hover:text-white hover:bg-zinc-800' }}
                             group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition duration-200">
                             <i class="fas fa-user shrink-0 w-6 text-center {{ request()->routeIs('settings.profile') ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"></i>
@@ -13,7 +13,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('settings.password') }}" wire:navigate
+                        <a href="{{ route('settings.password') }}" 
                             class="{{ request()->routeIs('settings.password') ? 'bg-moto-red text-white shadow-lg shadow-red-900/20' : 'text-gray-400 hover:text-white hover:bg-zinc-800' }}
                             group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition duration-200">
                             <i class="fas fa-lock shrink-0 w-6 text-center {{ request()->routeIs('settings.password') ? 'text-white' : 'text-gray-400 group-hover:text-white' }}"></i>

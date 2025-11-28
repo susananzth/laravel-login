@@ -41,8 +41,7 @@
 
                 @if (Route::has('password.request'))
                     <a class="text-sm text-moto-red hover:text-red-700 font-medium"
-                        href="{{ route('password.request') }}"
-                        wire:navigate>
+                        href="{{ route('password.request') }}">
                         {{ __('¿Olvidaste tu contraseña?') }}
                     </a>
                 @endif
@@ -58,8 +57,7 @@
                 <p class="text-gray-600">
                     {{ __('¿No tienes una cuenta?') }}
                     <a href="{{ route('register') }}"
-                        class="text-moto-red hover:text-red-700 font-medium"
-                        wire:navigate>
+                        class="text-moto-red hover:text-red-700 font-medium">
                         {{ __('Regístrate aquí') }}
                     </a>
                 </p>
