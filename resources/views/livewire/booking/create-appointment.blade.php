@@ -21,11 +21,16 @@
 
         <x-forms.input
             type="date"
-            label="Fecha"
+            label="Fecha del Servicio"
             name="date"
-            wireModel="date.live"
+            wire:model.live="date"  {{-- ¡Ahora sí funciona el .live! --}}
             min="{{ date('Y-m-d', strtotime('+1 day')) }}"
-        />
+            required
+        >
+            <div wire:loading wire:target="date" class="absolute right-3 top-3">
+                <i class="fas fa-spinner fa-spin text-moto-red"></i>
+            </div>
+        </x-forms.input>
 
         @if($service_id && $date)
             <div class="mb-6">

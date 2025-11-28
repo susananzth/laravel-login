@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Booking;
 
+use Illuminate\Support\Facades\Log; // Importante: agregar arriba
 use App\Mail\AppointmentNotification;
 use App\Models\Service;
 use App\Models\Appointment;
@@ -27,62 +28,55 @@ class CreateAppointment extends Component
     #[Computed]
     public function availableSlots()
     {
-        // 1. Si faltan datos básicos, retornamos vacío
-        if (!$this->service_id || !$this->date) {
+        if (!$this->service_id || !$this->date) return [];
+
+        $selectedDate = Carbon::parse($this->date);
+        
+        // DEBUG: Ver qué día está detectando
+        Log::info("--- DEBUG CITA ---");
+        Log::info("Fecha seleccionada: " . $this->date);
+        Log::info("Es fin de semana?: " . ($selectedDate->isWeekend() ? 'SI' : 'NO'));
+
+        // Si es fin de semana, retornamos vacío (verifica si estás probando un sábado/domingo)
+        if ($selectedDate->isWeekend()) {
+            Log::info("Cancelado por fin de semana");
             return [];
         }
+        
+        // ... resto de validaciones ...
 
-        try {
-            $selectedDate = Carbon::parse($this->date);
-            $now = now();
+        // Obtener horas ocupadas
+        $bookedAppointments = Appointment::whereDate('scheduled_at', $this->date)
+            ->whereIn('status', ['pending', 'confirmed', 'in_progress'])
+            ->get();
 
-            // 2. Validaciones de Negocio (Fechas pasadas, Domingo, etc)
-            // Si es ayer o antes
-            if ($selectedDate->lt($now->startOfDay())) return [];
-            // Si es fin de semana (Sábado=6, Domingo=0 en Carbon default, o >5 si usas ISO)
-            // Asumimos Lunes(1) a Viernes(5)
-            if ($selectedDate->isWeekend()) return []; 
-            
-            // 3. Obtener horas ocupadas (Método SEGURO)
-            $bookedAppointments = Appointment::whereDate('scheduled_at', $this->date)
-                ->whereIn('status', ['pending', 'confirmed', 'in_progress'])
-                ->get(); // Usamos get() para obtener los modelos completos
+        Log::info("Citas encontradas en BD para hoy: " . $bookedAppointments->count());
 
-            $bookedTimes = [];
-            foreach ($bookedAppointments as $appt) {
-                // Forzamos el parseo con Carbon para evitar error "Call format on string"
-                $bookedTimes[] = Carbon::parse($appt->scheduled_at)->format('H:i');
-            }
-
-            // 4. Generar grilla de horarios
-            $slots = [];
-            $start = Carbon::parse($this->date . ' 08:00');
-            $end = Carbon::parse($this->date . ' 17:30');
-
-            while ($start <= $end) {
-                // Si es HOY, no mostrar horas que ya pasaron (ej: son las 2pm, no mostrar las 9am)
-                if ($selectedDate->isToday() && $start->lt($now)) {
-                    $start->addMinutes(30);
-                    continue;
-                }
-
-                $timeString = $start->format('H:i');
-                
-                // Si la hora NO está en la lista de ocupados, la agregamos
-                if (!in_array($timeString, $bookedTimes)) {
-                    $slots[] = $timeString;
-                }
-                
-                $start->addMinutes(30);
-            }
-            
-            return $slots;
-
-        } catch (\Exception $e) {
-            // Loguear error para que tú como dev lo veas en laravel.log
-            \Illuminate\Support\Facades\Log::error("Error calculando slots: " . $e->getMessage());
-            return [];
+        $bookedTimes = [];
+        foreach ($bookedAppointments as $appt) {
+            $bookedTimes[] = Carbon::parse($appt->scheduled_at)->format('H:i');
         }
+        
+        // ... el while ...
+        $slots = [];
+        $start = Carbon::parse($this->date . ' 08:00');
+        $end = Carbon::parse($this->date . ' 17:30');
+        
+        while ($start <= $end) {
+            // ... lógica del while ...
+            $timeString = $start->format('H:i');
+
+            if (!in_array($timeString, $bookedTimes)) {
+                $slots[] = $timeString;
+            } else {
+                Log::info("Hora ocupada encontrada y excluida: " . $timeString);
+            }
+            $start->addMinutes(30);
+        }
+        
+        Log::info("Slots totales generados: " . count($slots));
+        
+        return $slots;
     }
 
     public function rules()
