@@ -40,8 +40,8 @@
             <div class="-mr-2 flex md:hidden">
                 <button @click="open = !open" type="button" class="text-gray-500 hover:text-moto-red focus:outline-none p-2 rounded-md transition duration-150">
                     <span class="sr-only">Menú</span>
-                    <i :class="{ 'hidden': open, 'block': !open }" class="fas fa-bars h-6 w-6"></i>
-                    <i :class="{ 'hidden': !open, 'block': open }" class="fas fa-times h-6 w-6"></i>
+                    <i x-show="!open" class="fas fa-bars h-6 w-6 transform transition-transform duration-200"></i>
+                    <i x-show="open" x-cloak class="fas fa-times h-6 w-6 transform transition-transform duration-200"></i>
                 </button>
             </div>
         </div>

@@ -1,6 +1,6 @@
 <x-layouts.app>
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-5">
 
             @canany(['appointments.view_all', 'appointments.be_assigned'])
                 <h2 class="text-3xl font-extrabold text-moto-black border-b pb-2 mb-6">
@@ -38,8 +38,6 @@
                     </div>
                 </div>
             @endcanany
-
-            
 
             @can('appointments.create')
                 {{-- Sección de Acción para Clientes --}}

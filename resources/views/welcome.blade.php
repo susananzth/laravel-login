@@ -39,10 +39,10 @@
     </header>
 
     {{-- Features Section --}}
-    <section class="py-24 bg-gray-50 relative">
+    <section class="py-24 bg-gray-50 relative overflow-hidden">
         <div class="absolute top-0 left-0 right-0 h-16 bg-moto-black rounded-b-[50%] md:rounded-b-[100%] transform -translate-y-1/2 scale-x-110"></div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-4xl font-black text-moto-black mb-4">¿Por qué elegirnos?</h2>
                 <p class="text-gray-600 max-w-2xl mx-auto text-lg">Hemos optimizado cada paso del proceso para que tu experiencia sea tan veloz como tu moto.</p>
