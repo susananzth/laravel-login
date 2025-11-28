@@ -64,6 +64,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     g++ \
     libpq-dev \
+    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala las extensiones de PHP necesarias para Laravel
@@ -88,6 +89,9 @@ WORKDIR /var/www/html
 # 1. Copiamos el código fuente de tu proyecto al contenedor
 COPY . .
 
+# 1.1. Copiar el archivo de configuración de Supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 # Limpieza defensiva: Eliminamos caches que se hayan colado y creamos carpetas necesarias
 RUN rm -rf bootstrap/cache/*.php \
     && mkdir -p storage/framework/cache/data \
@@ -99,6 +103,9 @@ COPY --from=backend_build /app/vendor ./vendor
 
 # 3. Traemos los assets compilados (public/build) desde la etapa de Node
 COPY --from=frontend_build /app/public ./public
+
+# Crea archivo de log para wl worker
+RUN mkdir -p storage/logs && touch storage/logs/worker.log
 
 # Configuración de permisos críticos
 # Asignamos la propiedad al usuario www-data (el usuario por defecto de php-fpm)
@@ -118,7 +125,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 # Comando para ejecutar PHP-FPM en primer plano
-CMD ["php-fpm", "-F"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 # --------------------------------------
 # ETAPA 4: Imagen Final de WEB (Nginx)
