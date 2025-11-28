@@ -14,7 +14,8 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
     public $isWelcome; // Variable para saber el contexto
 
     /**
-     * Recibimos si es bienvenida (true) o solo cambio de correo (false)
+     * Constructor que recibe el contexto.
+     * @param bool $isWelcome True si es un registro nuevo, False si solo cambió el email en perfil.
      */
     public function __construct($isWelcome = false)
     {
@@ -26,9 +27,10 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        // Lógica nativa de Laravel para generar la URL firmada segura
+        // Genera URL firmada temporal. Si alguien altera un solo caracter de la URL, Laravel la rechaza.
         $url = $this->verificationUrl($notifiable);
 
+        // Lógica condicional para enviar plantillas de correo diferentes
         // CASO 1: Registro Nuevo (Bienvenida)
         if ($this->isWelcome) {
             return (new MailMessage)

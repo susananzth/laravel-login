@@ -9,13 +9,21 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Correo de notificación de cuenta eliminada.
+ * Implementa ShouldQueue: Esto significa que el correo no se envía al instante
+ * (lo que frenaría la web), sino que se manda a una cola de trabajo en segundo plano.
+ * Mejora MUCHO la experiencia del usuario.
+ */
 class AccountDeletedNotification extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     public $firstname;
 
-    // Recibimos solo el nombre, no el objeto User completo para evitar errores tras borrarlo
+    // Recibimos solo el nombre (string) y no el modelo User.
+    // ¿Por qué? Porque si el User se borra de la BD antes de que la cola procese el email,
+    // fallaría al intentar serializar un modelo que ya no existe (`SerializesModels`).
     public function __construct($firstname)
     {
         $this->firstname = $firstname;

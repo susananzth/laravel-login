@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\Auth\ResetPasswordNotification;
 use App\Notifications\Auth\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -12,14 +11,18 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * Modelo User. Representa a los usuarios en la base de datos.
+ * Implementa MustVerifyEmail para obligar a verificar el correo.
+ */
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, HasRoles, Notifiable; // HasRoles activa los métodos de Spatie (assignRole, hasPermissionTo, etc.)
 
     /**
-     * The attributes that are mass assignable.
-     *
+     * $fillable: Lista blanca de atributos que se pueden asignar masivamente.
+     * Protege contra ataques de 'Mass Assignment' donde un hacker intenta inyectar campos extra (ej: is_admin).
      * @var list<string>
      */
     protected $fillable = [
@@ -32,8 +35,8 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
+     * $hidden: Atributos que NUNCA deben enviarse en respuestas JSON (API) o arrays.
+     * Vital para no exponer contraseñas hasheadas o tokens.
      * @var list<string>
      */
     protected $hidden = [
@@ -42,9 +45,8 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * casts: Conversión automática de tipos de datos al leer de la BD.
+     * 'hashed' asegura que al asignar un password, Laravel maneje el hash correctamente (en versiones nuevas).
      */
     protected function casts(): array
     {
@@ -55,25 +57,30 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the user's initials
+     * Método auxiliar para obtener las iniciales del usuario (Ej: Juan Perez -> JP).
+     * Útil para avatares cuando no hay foto.
      */
     public function initials(): string
     {
+        // Usa la utilidad Str de Laravel para manipulación segura de cadenas
         $firstname_initial = Str::of($this->firstname)
-            ->explode(' ')
-            ->take(1)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->explode(' ') // Separa por espacios
+            ->take(1)      // Toma el primer nombre
+            ->map(fn ($word) => Str::substr($word, 0, 1)) // Toma la primera letra
             ->implode('');
+
         $lastname_initial = Str::of($this->lastname)
             ->explode(' ')
             ->take(1)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+
         return $firstname_initial . $lastname_initial;
     }
 
     /**
-     * Sobrescribe el envío de notificación de reset password.
+     * Personalización del envío de correo de restablecimiento de contraseña.
+     * Usamos nuestra propia notificación para controlar el diseño del email.
      */
     public function sendPasswordResetNotification($token)
     {
@@ -81,21 +88,24 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Sobrescribe el envío de notificación de verificación de email.
+     * Personalización del envío de verificación de email.
+     * Detectamos si es un usuario recién creado para enviar un mensaje de "Bienvenida" vs "Verificación simple".
      */
     public function sendEmailVerificationNotification()
     {
-        // wasRecentlyCreated es TRUE solo en el momento exacto del registro.
-        // Si actualizan el perfil después, será FALSE.
+        // wasRecentlyCreated es una propiedad mágica de Eloquent que indica si el modelo se acaba de insertar en este request.
         $this->notify(new VerifyEmailNotification($this->wasRecentlyCreated));
     }
 
-    // Citas como cliente
+    // --- RELACIONES (Eloquent) ---
+
+    // Un usuario (Cliente) tiene muchas citas solicitadas.
     public function appointments() {
         return $this->hasMany(Appointment::class);
     }
 
-    // Citas asignadas como técnico
+    // Un usuario (Técnico) tiene muchas citas asignadas para trabajar.
+    // Especificamos 'technician_id' porque no sigue la convención estándar (user_id).
     public function assignedAppointments() {
         return $this->hasMany(Appointment::class, 'technician_id');
     }
