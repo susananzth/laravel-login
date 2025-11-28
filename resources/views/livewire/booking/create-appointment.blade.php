@@ -28,25 +28,48 @@
         />
 
         @if($service_id && $date)
-            <div>
+            <div class="mb-6">
                 <label class="block text-sm font-semibold text-moto-black mb-2">
                     Hora Disponible
+                    {{-- Spinner de carga --}}
                     <span wire:loading wire:target="date" class="text-xs text-moto-red font-normal ml-2">
                         <i class="fas fa-spinner fa-spin"></i> Calculando...
                     </span>
                 </label>
-                <div class="grid grid-cols-4 gap-2">
-                    @foreach($this->availableSlots as $slot)
-                        <button
-                            type="button"
-                            class="px-3 py-2 text-sm rounded border {{ $time == $slot ? 'bg-moto-red text-white border-moto-red' : 'bg-white text-gray-700 hover:border-moto-red' }}"
-                            wire:click="$set('time', '{{ $slot }}')"
-                        >
-                            {{ $slot }}
-                        </button>
-                    @endforeach
-                </div>
-                @error('time') <span class="text-red-500 text-sm">Seleccione una hora</span> @enderror
+
+                {{-- Debug temporal: Si esto imprime [], es que la lógica backend retorna vacío --}}
+                {{-- @dump($this->availableSlots) --}}
+
+                @if(count($this->availableSlots) > 0)
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                        @foreach($this->availableSlots as $slot)
+                            <button
+                                type="button"
+                                wire:click="$set('time', '{{ $slot }}')"
+                                class="px-2 py-2 text-sm rounded border transition duration-150
+                                {{ $time === $slot 
+                                    ? 'bg-moto-red text-white border-moto-red shadow-md transform scale-105' 
+                                    : 'bg-white text-gray-700 border-gray-200 hover:border-moto-red hover:text-moto-red' 
+                                }}"
+                            >
+                                {{ $slot }}
+                            </button>
+                        @endforeach
+                    </div>
+                @else
+                    {{-- Feedback visual si no hay horas --}}
+                    <div class="p-4 bg-yellow-50 border border-yellow-100 rounded-lg text-yellow-700 text-sm flex items-center">
+                        <i class="fas fa-calendar-times mr-2 text-lg"></i>
+                        <span>
+                            No hay horarios disponibles para esta fecha. 
+                            <span class="block text-xs mt-1 text-yellow-600">
+                                (Puede ser fin de semana, fecha pasada o agenda llena).
+                            </span>
+                        </span>
+                    </div>
+                @endif
+                
+                @error('time') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
             </div>
         @endif
 
