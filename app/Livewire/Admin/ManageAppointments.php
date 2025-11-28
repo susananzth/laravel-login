@@ -43,12 +43,12 @@ class ManageAppointments extends Component
                 function ($attribute, $value, $fail) {
                     if ($this->date && $value) {
                         $selectedDateTime = Carbon::parse($this->date . ' ' . $value);
-                        
+
                         if ($selectedDateTime->lt(now())) {
                             $fail('No se puede programar en el pasado.');
                             return;
                         }
-                        
+
                         if (!$this->isBusinessHours($selectedDateTime)) {
                             $fail('Horario no laboral (L-V 8:00-18:00).');
                             return;
@@ -130,12 +130,12 @@ class ManageAppointments extends Component
             $appointment = Appointment::findOrFail($this->appointmentId);
             // Validar fecha y hora combinadas
             $scheduledDateTime = Carbon::parse($this->date . ' ' . $this->time);
-            
+
             if ($scheduledDateTime->lt(now())) {
                 $this->addError('time', 'La fecha y hora deben ser iguales o posteriores a la actual.');
                 return;
             }
-    
+
             // 1. Llenamos los datos PERO NO GUARDAMOS AÚN
             $appointment->fill([
                 'scheduled_at' => $scheduledDateTime,
@@ -143,28 +143,33 @@ class ManageAppointments extends Component
                 'status' => $this->status,
                 'notes' => $this->notes,
             ]);
-    
+
             // 2. Detectamos si cambió algo importante para el cliente
             $shouldNotify = $appointment->isDirty(['scheduled_at', 'status']);
-    
+
             // Detectamos si es cancelación para cambiar el asunto del correo
             $type = ($this->status === 'cancelled') ? 'cancelled' : 'updated';
-    
+
             // 3. Guardamos
             $appointment->save();
-    
+
             // 4. Enviamos correo SOLO si hubo cambios relevantes
             if ($shouldNotify) {
-                Mail::to($appointment->client->email)->send(new AppointmentNotification($appointment, $type));
+                try {
+                    Mail::to($appointment->client->email)->send(new AppointmentNotification($appointment, $type));
+                } catch (\Exception $e) {
+                    // ESTO ES PARA VER EL ERROR EN PANTALLA
+                    dd("Error enviando correo: " . $e->getMessage());
+                }
             }
-    
+
             $this->showModal = false;
             $this->dispatch('close-modal');
             // Mensaje diferente si se notificó
             $msg = $shouldNotify
                 ? 'Cita actualizada y cliente notificado por correo.'
                 : 'Cita actualizada correctamente.';
-    
+
             $this->dispatch('notify', $msg);
         } catch (\Exception $e) {
             $this->dispatch('app-error', 'Error al actualizar la cita.');

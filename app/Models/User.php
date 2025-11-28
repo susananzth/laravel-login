@@ -85,7 +85,9 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new VerifyEmailNotification());
+        // wasRecentlyCreated es TRUE solo en el momento exacto del registro.
+        // Si actualizan el perfil después, será FALSE.
+        $this->notify(new VerifyEmailNotification($this->wasRecentlyCreated));
     }
 
     // Citas como cliente

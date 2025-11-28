@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\Appointment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -10,20 +9,16 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AppointmentNotification extends Mailable implements ShouldQueue
+class AccountDeletedNotification extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $appointment;
-    public $type; // 'created', 'updated', 'cancelled'
+    public $firstname;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(Appointment $appointment, $type = 'updated')
+    // Recibimos solo el nombre, no el objeto User completo para evitar errores tras borrarlo
+    public function __construct($firstname)
     {
-        $this->appointment = $appointment;
-        $this->type = $type;
+        $this->firstname = $firstname;
     }
 
     /**
@@ -31,14 +26,8 @@ class AppointmentNotification extends Mailable implements ShouldQueue
      */
     public function envelope(): Envelope
     {
-        $subject = match($this->type) {
-            'created' => '¡Reserva Confirmada! - MotoRápido',
-            'cancelled' => 'Cita Cancelada - MotoRápido',
-            default => 'Actualización de tu Cita - MotoRápido',
-        };
-
         return new Envelope(
-            subject: $subject,
+            subject: 'Cuenta Eliminada - MotoRápido',
         );
     }
 
@@ -48,7 +37,7 @@ class AppointmentNotification extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.appointment-notification',
+            view: 'emails.account-deleted',
         );
     }
 

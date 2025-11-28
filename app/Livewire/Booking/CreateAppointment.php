@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Booking;
 
-use Illuminate\Support\Facades\Log; // Importante: agregar arriba
+use Illuminate\Support\Facades\Log;
 use App\Mail\AppointmentNotification;
 use App\Models\Service;
 use App\Models\Appointment;
@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
-use Illuminate\Support\Facades\Validator;
 
 class CreateAppointment extends Component
 {
@@ -28,55 +27,61 @@ class CreateAppointment extends Component
     #[Computed]
     public function availableSlots()
     {
-        if (!$this->service_id || !$this->date) return [];
-
-        $selectedDate = Carbon::parse($this->date);
-        
-        // DEBUG: Ver qué día está detectando
-        Log::info("--- DEBUG CITA ---");
-        Log::info("Fecha seleccionada: " . $this->date);
-        Log::info("Es fin de semana?: " . ($selectedDate->isWeekend() ? 'SI' : 'NO'));
-
-        // Si es fin de semana, retornamos vacío (verifica si estás probando un sábado/domingo)
-        if ($selectedDate->isWeekend()) {
-            Log::info("Cancelado por fin de semana");
+        // 1. Si faltan datos básicos, retornamos vacío
+        if (!$this->service_id || !$this->date) {
             return [];
         }
-        
-        // ... resto de validaciones ...
+        try {
+            $selectedDate = Carbon::parse($this->date);
 
-        // Obtener horas ocupadas
-        $bookedAppointments = Appointment::whereDate('scheduled_at', $this->date)
-            ->whereIn('status', ['pending', 'confirmed', 'in_progress'])
-            ->get();
+            $now = now();
 
-        Log::info("Citas encontradas en BD para hoy: " . $bookedAppointments->count());
+            // 2. Validaciones de Negocio (Fechas pasadas, Domingo, etc)
+            // Si es ayer o antes
+            if ($selectedDate->lt($now->startOfDay())) return [];
+            // Si es fin de semana (Sábado=6, Domingo=0 en Carbon default)
+            // Asumimos Lunes(1) a Viernes(5)
+            if ($selectedDate->isWeekend()) return [];
 
-        $bookedTimes = [];
-        foreach ($bookedAppointments as $appt) {
-            $bookedTimes[] = Carbon::parse($appt->scheduled_at)->format('H:i');
-        }
-        
-        // ... el while ...
-        $slots = [];
-        $start = Carbon::parse($this->date . ' 08:00');
-        $end = Carbon::parse($this->date . ' 17:30');
-        
-        while ($start <= $end) {
-            // ... lógica del while ...
-            $timeString = $start->format('H:i');
+            // 3. Obtener horas ocupadas (Método SEGURO)
+            $bookedAppointments = Appointment::whereDate('scheduled_at', $this->date)
+                ->whereIn('status', ['pending', 'confirmed', 'in_progress'])
+                ->get(); // Usamos get() para obtener los modelos completos
 
-            if (!in_array($timeString, $bookedTimes)) {
-                $slots[] = $timeString;
-            } else {
-                Log::info("Hora ocupada encontrada y excluida: " . $timeString);
+
+            $bookedTimes = [];
+            foreach ($bookedAppointments as $appt) {
+                // Forzamos el parseo con Carbon para evitar error "Call format on string"
+                $bookedTimes[] = Carbon::parse($appt->scheduled_at)->format('H:i');
             }
-            $start->addMinutes(30);
+
+            // 4. Generar grilla de horarios
+            $slots = [];
+            $start = Carbon::parse($this->date . ' 08:00');
+            $end = Carbon::parse($this->date . ' 17:30');
+
+            while ($start <= $end) {
+                // Si es HOY, no mostrar horas que ya pasaron (ej: son las 2pm, no mostrar las 9am)
+                if ($selectedDate->isToday() && $start->lt($now)) {
+                    $start->addMinutes(30);
+                    continue;
+                }
+
+                $timeString = $start->format('H:i');
+
+                // Si la hora NO está en la lista de ocupados, la agregamos
+                if (!in_array($timeString, $bookedTimes)) {
+                    $slots[] = $timeString;
+                }
+                $start->addMinutes(30);
+            }
+
+            return $slots;
+        } catch (\Exception $e) {
+            $this->dispatch('app-error', 'Algo falló al mostrar los horarios, por favor contacte al administrador');
+            Log::error("Error calculando slots: " . $e->getMessage());
+            return [];
         }
-        
-        Log::info("Slots totales generados: " . count($slots));
-        
-        return $slots;
     }
 
     public function rules()
@@ -109,13 +114,13 @@ class CreateAppointment extends Component
                 function ($attribute, $value, $fail) {
                     if ($this->date && $value) {
                         $selectedDateTime = Carbon::parse($this->date . ' ' . $value);
-                        
+
                         // Validar que no sea en el pasado
                         if ($selectedDateTime->lt(now())) {
                             $fail('La fecha y hora seleccionadas no pueden ser en el pasado.');
                             return;
                         }
-                        
+
                         // Validar que el slot esté disponible
                         $availableSlots = $this->availableSlots;
                         if (!in_array($value, $availableSlots)) {
@@ -176,18 +181,18 @@ class CreateAppointment extends Component
         $this->validateOnly('service_id');
     }
 
-    public function getServicesProperty() 
+    public function getServicesProperty()
     {
         return Service::where('is_active', true)->get();
     }
 
-    public function save() 
+    public function save()
     {
         $this->validate();
 
         try {
             $scheduledAt = Carbon::parse($this->date . ' ' . $this->time);
-            
+
             // Validación final de integridad
             if ($scheduledAt->lt(now())) {
                 $this->addError('time', 'No se puede agendar en el pasado.');
@@ -214,7 +219,12 @@ class CreateAppointment extends Component
             ]);
 
             // Enviar email de confirmación
-            Mail::to(Auth::user()->email)->send(new AppointmentNotification($cita, 'created'));
+            try {
+                Mail::to(Auth::user()->email)->send(new AppointmentNotification($cita, 'created'));
+            } catch (\Exception $e) {
+                // ESTO ES PARA VER EL ERROR EN PANTALLA
+                dd("Error enviando correo: " . $e->getMessage());
+            }
 
             // Reset y redirección
             $this->reset(['service_id', 'date', 'time', 'notes']);
@@ -224,7 +234,7 @@ class CreateAppointment extends Component
             return redirect()->route('dashboard')->with('success', '¡Cita agendada con éxito!');
 
         } catch (\Exception $e) {
-            $this->dispatch('notify', type: 'error', message: 'Error al agendar la cita. Por favor intente nuevamente.');
+            $this->dispatch('notify', type: 'app-error', message: 'Error al agendar la cita. Por favor intente nuevamente.');
         }
     }
 
@@ -239,24 +249,13 @@ class CreateAppointment extends Component
 
         // Eliminar etiquetas HTML peligrosas
         $cleaned = strip_tags($notes);
-        
+
         // Limitar longitud
         if (strlen($cleaned) > 500) {
             $cleaned = substr($cleaned, 0, 500);
         }
-        
-        return $cleaned;
-    }
 
-    /**
-     * Verifica si una fecha y hora están en horario laboral
-     */
-    private function isBusinessHours(Carbon $dateTime)
-    {
-        $isWeekday = $dateTime->dayOfWeek >= 1 && $dateTime->dayOfWeek <= 5;
-        $isBusinessHour = $dateTime->hour >= 8 && $dateTime->hour < 18;
-        
-        return $isWeekday && $isBusinessHour;
+        return $cleaned;
     }
 
     public function render()
