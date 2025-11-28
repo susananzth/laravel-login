@@ -83,7 +83,7 @@ class ManageServices extends Component
         abort_unless(auth()->user()->hasPermissionTo('services.delete'), 403);
 
         if (Service::find($id)->appointments()->exists()) {
-            $this->dispatch('error', 'No puedes eliminar porque tiene citas asociadas.');
+            $this->dispatch('app-error', 'No puedes eliminar porque tiene citas asociadas.');
             return;
         }
 

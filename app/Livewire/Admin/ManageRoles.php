@@ -65,7 +65,7 @@ class ManageRoles extends Component
         abort_unless(auth()->user()->hasAnyPermission(['roles.create', 'roles.edit']), 403);
 
         if ($this->isSystemRole) {
-            $this->dispatch('error', 'Este es un rol del sistema, no se puede editar.');
+            $this->dispatch('app-error', 'Este es un rol del sistema, no se puede editar.');
             return;
         }
 
@@ -96,7 +96,7 @@ class ManageRoles extends Component
 
         // Proteger roles críticos
         if (in_array($role->id, [1, 2, 3])) {
-            $this->dispatch('error', 'No puedes eliminar roles del sistema.');
+            $this->dispatch('app-error', 'No puedes eliminar roles del sistema.');
             return;
         }
 

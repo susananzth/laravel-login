@@ -26,13 +26,15 @@
             wireModel="date.live"
             min="{{ date('Y-m-d', strtotime('+1 day')) }}"
         />
-        <div wire:loading wire:target="date" class="text-sm text-moto-red mt-2">
-            <i class="fas fa-spinner fa-spin"></i> Buscando horarios disponibles...
-        </div>
 
         @if($service_id && $date)
             <div>
-                <label class="block text-sm font-semibold text-moto-black mb-2">Hora Disponible</label>
+                <label class="block text-sm font-semibold text-moto-black mb-2">
+                    Hora Disponible
+                    <span wire:loading wire:target="date" class="text-xs text-moto-red font-normal ml-2">
+                        <i class="fas fa-spinner fa-spin"></i> Calculando...
+                    </span>
+                </label>
                 <div class="grid grid-cols-4 gap-2">
                     @foreach($this->availableSlots as $slot)
                         <button

@@ -115,7 +115,7 @@ class ManageUsers extends Component
         if($id) {
             // Evitar auto-eliminación
             if($id === auth()->id()) {
-                $this->dispatch('error', 'No puedes eliminar tu propia cuenta');
+                $this->dispatch('app-error', 'No puedes eliminar tu propia cuenta');
                 return;
             }
             User::find($id)->delete();

@@ -167,7 +167,7 @@ class ManageAppointments extends Component
     
             $this->dispatch('notify', $msg);
         } catch (\Exception $e) {
-            $this->dispatch('error', 'Error al actualizar la cita.');
+            $this->dispatch('app-error', 'Error al actualizar la cita.');
         }
 
     }
@@ -181,7 +181,7 @@ class ManageAppointments extends Component
 
             // Validar que no esté completada
             if ($appointment->status === 'completed') {
-                $this->dispatch('error', 'No se puede cancelar una cita completada.');
+                $this->dispatch('app-error', 'No se puede cancelar una cita completada.');
                 return;
             }
 
@@ -192,7 +192,7 @@ class ManageAppointments extends Component
 
             $this->dispatch('notify', 'Cita cancelada y notificada por correo.');
         } catch (\Exception $e) {
-            $this->dispatch('error', 'Error al cancelar la cita.');
+            $this->dispatch('app-error', 'Error al cancelar la cita.');
         }
     }
 
