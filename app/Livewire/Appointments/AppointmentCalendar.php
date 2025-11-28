@@ -118,7 +118,7 @@ class AppointmentCalendar extends Component
         $newStatus = $this->status;
 
         // Validar transiciones permitidas
-        $allowedTransitions = [
+        /*$allowedTransitions = [
             'pending' => ['confirmed', 'cancelled'],
             'confirmed' => ['in_progress', 'cancelled'],
             'in_progress' => ['completed', 'cancelled'],
@@ -129,7 +129,7 @@ class AppointmentCalendar extends Component
         if (!in_array($newStatus, $allowedTransitions[$currentStatus])) {
             $this->dispatch('error', 'Transición de estado no permitida de ' . __($currentStatus) . ' a ' . __($newStatus) . '.');
             return;
-        }
+        }*/
 
         // Solo administradores pueden cancelar citas confirmadas
         if ($currentStatus === 'confirmed' && $newStatus === 'cancelled') {
@@ -149,7 +149,7 @@ class AppointmentCalendar extends Component
             $this->selectedAppointment->update([
                 'technician_id' => $this->technician_id ?: null, // Si viene vacío, null
                 'status' => $this->status,
-                'notes' => $this->adminNotes ? clean(strip_tags($this->adminNotes)) : null
+                'notes' => $this->adminNotes ? $this->clean($this->adminNotes) : null
             ]);
 
             $this->showModal = false;
@@ -274,6 +274,26 @@ class AppointmentCalendar extends Component
             $this->dispatch('error', $e->getMessage());
             $this->dispatch('refresh-calendar'); // Recargar para revertir visualmente
         }
+    }
+
+    /**
+     * Limpia y sanitiza las notas
+     */
+    private function clean($notes)
+    {
+        if (empty($notes)) {
+            return null;
+        }
+
+        // Eliminar etiquetas HTML peligrosas
+        $cleaned = strip_tags($notes);
+        
+        // Limitar longitud
+        if (strlen($cleaned) > 500) {
+            $cleaned = substr($cleaned, 0, 500);
+        }
+        
+        return $cleaned;
     }
 
     private function isBusinessHours(Carbon $date)

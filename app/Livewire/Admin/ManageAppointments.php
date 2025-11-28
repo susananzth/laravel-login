@@ -58,12 +58,12 @@ class ManageAppointments extends Component
             ],
             'technician_id' => [
                 'nullable',
-                'integer',
+                'integer'/*,
                 Rule::exists('users', 'id')->where(function ($query) {
                     $query->whereHas('permissions', function($q) {
                         $q->where('name', 'appointments.be_assigned');
                     });
-                })
+                })*/
             ],
             'status' => [
                 'required',

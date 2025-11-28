@@ -8,6 +8,7 @@ use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Auth\VerifyEmail;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LogoutController;
 
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)->name('login');
@@ -28,5 +29,5 @@ Route::middleware('auth')->group(function () {
         ->name('password.confirm');
 });
 
-Route::post('logout', App\Livewire\Actions\Logout::class)
-    ->name('logout');
+//Route::post('logout', App\Livewire\Actions\Logout::class)->name('logout');
+Route::post('logout', LogoutController::class)->name('logout');
