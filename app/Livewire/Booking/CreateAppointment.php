@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 
@@ -23,7 +24,8 @@ class CreateAppointment extends Component
     public $notes;
 
     // Computed property para los slots disponibles
-    public function getAvailableSlotsProperty() 
+    #[Computed]
+    public function availableSlots()
     {
         if (!$this->service_id || !$this->date) return [];
 
@@ -108,7 +110,7 @@ class CreateAppointment extends Component
                         }
                         
                         // Validar que el slot esté disponible
-                        $availableSlots = $this->getAvailableSlotsProperty;
+                        $availableSlots = $this->availableSlots;
                         if (!in_array($value, $availableSlots)) {
                             $fail('Este horario ya no está disponible. Por favor seleccione otro.');
                         }
@@ -186,12 +188,13 @@ class CreateAppointment extends Component
             }
 
             // Verificar disponibilidad final (por si alguien más reservó)
-            $isStillAvailable = !Appointment::where('scheduled_at', $scheduledAt->format('Y-m-d H:i:s'))
+            $exists = Appointment::where('scheduled_at', $scheduledAt)
                 ->whereIn('status', ['pending', 'confirmed', 'in_progress'])
+                ->lockForUpdate()
                 ->exists();
 
-            if (!$isStillAvailable) {
-                $this->addError('time', 'Lo sentimos, este horario ya fue reservado. Por favor seleccione otro.');
+            if ($exists) {
+                $this->addError('time', 'El horario fue tomado hace un instante.');
                 return;
             }
 
@@ -252,7 +255,7 @@ class CreateAppointment extends Component
     public function render()
     {
         return view('livewire.booking.create-appointment', [
-            'availableSlots' => $this->getAvailableSlotsProperty
+            'availableSlots' => $this->availableSlots
         ]);
     }
 }

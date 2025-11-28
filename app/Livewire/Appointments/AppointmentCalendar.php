@@ -149,7 +149,7 @@ class AppointmentCalendar extends Component
             $this->selectedAppointment->update([
                 'technician_id' => $this->technician_id ?: null, // Si viene vacío, null
                 'status' => $this->status,
-                'notes' => $this->adminNotes ? clean($this->adminNotes) : null
+                'notes' => $this->adminNotes ? clean(strip_tags($this->adminNotes)) : null
             ]);
 
             $this->showModal = false;
@@ -171,7 +171,7 @@ class AppointmentCalendar extends Component
         
         // Validar que la cita no esté completada o cancelada
         if (in_array($this->selectedAppointment->status, ['completed', 'cancelled'])) {
-            $this->dispatch('error', 'No se puede modificar una cita ' . _($this->selectedAppointment->status) . '.');
+            $this->dispatch('error', 'No se puede modificar una cita ' . __($this->selectedAppointment->status) . '.');
             return;
         }
 
