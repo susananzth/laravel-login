@@ -100,14 +100,7 @@ class AppointmentCalendar extends Component
             'technician_id' => [
                 'nullable', 
                 'integer', 
-                'exists:users,id',
-                function ($attribute, $value, $fail) {
-                    if ($value && !User::where('id', $value)->whereHas('permissions', function($q) {
-                        $q->where('name', 'appointments.be_assigned');
-                    })->exists()) {
-                        $fail('El usuario seleccionado no es un técnico válido.');
-                    }
-                }
+                'exists:users,id'
             ],
             'adminNotes' => [
                 'nullable', 
@@ -178,7 +171,7 @@ class AppointmentCalendar extends Component
         
         // Validar que la cita no esté completada o cancelada
         if (in_array($this->selectedAppointment->status, ['completed', 'cancelled'])) {
-            $this->dispatch('error', 'No se puede modificar una cita ' . $this->selectedAppointment->status . '.');
+            $this->dispatch('error', 'No se puede modificar una cita ' . _($this->selectedAppointment->status) . '.');
             return;
         }
 
