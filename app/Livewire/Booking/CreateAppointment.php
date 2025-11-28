@@ -29,39 +29,35 @@ class CreateAppointment extends Component
     {
         if (!$this->service_id || !$this->date) return [];
 
-        // Validar que la fecha no sea en el pasado
         $selectedDate = Carbon::parse($this->date);
-        if ($selectedDate->lt(now()->startOfDay())) {
-            return [];
-        }
+        $now = now();
 
-        // Validar que no sea más de 3 meses en el futuro
-        if ($selectedDate->gt(now()->addMonths(3))) {
-            return [];
-        }
+        // 1. Validaciones básicas de fecha (Pasado, Futuro, Fines de semana)
+        if ($selectedDate->lt($now->startOfDay())) return [];
+        if ($selectedDate->gt($now->copy()->addMonths(3))) return [];
+        if ($selectedDate->isWeekend()) return [];
 
-        // Validar que sea día laboral (Lunes a Viernes)
-        if ($selectedDate->dayOfWeek < 1 || $selectedDate->dayOfWeek > 5) {
-            return [];
-        }
-
-        // Obtener las horas YA ocupadas para ese día
+        // 2. Obtener citas ocupadas
         $bookedTimes = Appointment::whereDate('scheduled_at', $this->date)
             ->whereIn('status', ['pending', 'confirmed', 'in_progress'])
-            ->get()
-            ->map(function($appointment) {
-                return $appointment->scheduled_at->format('H:i');
-            })->toArray();
+            ->pluck('scheduled_at') // Más eficiente que get() + map()
+            ->map(fn($date) => $date->format('H:i'))
+            ->toArray();
 
         $slots = [];
         $start = Carbon::parse($this->date . ' 08:00');
         $end = Carbon::parse($this->date . ' 17:30');
 
-        // Generar slots cada 30 minutos
         while ($start <= $end) {
+            // Lógica CRÍTICA añadida:
+            // Si la fecha seleccionada es HOY, no mostrar horas que ya pasaron.
+            if ($selectedDate->isToday() && $start->lt($now)) {
+                $start->addMinutes(30);
+                continue;
+            }
+
             $timeString = $start->format('H:i');
             
-            // Solo agregar si NO está ocupado
             if (!in_array($timeString, $bookedTimes)) {
                 $slots[] = $timeString;
             }
