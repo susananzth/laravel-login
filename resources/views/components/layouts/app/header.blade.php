@@ -56,12 +56,7 @@
                         <i class="fas fa-user-circle mr-2 w-4"></i> Tu Perfil
                     </a>
 
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="block w-full text-left px-3 py-1 text-sm leading-6 text-red-600 hover:bg-red-50">
-                            <i class="fas fa-sign-out-alt mr-2 w-4"></i> Cerrar Sesión
-                        </button>
-                    </form>
+                    <livewire:layouts.logout-button />
                 </div>
             </div>
         </div>
