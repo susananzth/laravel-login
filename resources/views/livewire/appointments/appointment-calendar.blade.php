@@ -125,8 +125,10 @@
                         label="Notas Internas"
                         name="adminNotes"
                         wireModel="adminNotes"
-                        placeholder="Escribe notas para el técnico..."
+                        placeholder="Escribe notas..."
                         type="textarea"
+                        maxlength="500"
+                        oninput="this.value = this.value.slice(0, 500)"
                     />
                 </div>
 

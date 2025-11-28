@@ -73,23 +73,100 @@ class AppointmentCalendar extends Component
     {
         abort_unless(auth()->user()->hasAnyPermission(['appointments.be_assigned', 'appointments.assign', 'appointments.complete']), 403);
 
+        $user = Auth::user();
+        $appointment = $this->selectedAppointment;
+
+        // Técnicos solo pueden modificar sus propias citas
+        if ($user->hasPermissionTo('appointments.be_assigned') && !$user->hasPermissionTo('appointments.assign')) {
+            if ($appointment->technician_id !== $user->id) {
+                $this->dispatch('error', 'Solo puedes modificar tus propias citas asignadas.');
+                return;
+            }
+        }
+
+        // No permitir modificar citas completadas o canceladas
+        if (in_array($appointment->status, ['completed', 'cancelled'])) {
+            $this->dispatch('error', 'No se puede modificar una cita ' . __($appointment->status) . '.');
+            return;
+        }
+
         $this->validate([
-            'status' => 'required',
+            'status' => [
+                'required', 
+                'string', 
+                'in:pending,confirmed,in_progress,completed,cancelled',
+                'max:20'
+            ],
+            'technician_id' => [
+                'nullable', 
+                'integer', 
+                'exists:users,id',
+                function ($attribute, $value, $fail) {
+                    if ($value && !User::where('id', $value)->whereHas('permissions', function($q) {
+                        $q->where('name', 'appointments.be_assigned');
+                    })->exists()) {
+                        $fail('El usuario seleccionado no es un técnico válido.');
+                    }
+                }
+            ],
+            'adminNotes' => [
+                'nullable', 
+                'string', 
+                'max:500',
+                function ($attribute, $value, $fail) {
+                    if ($value && preg_match('/<script|javascript:|onclick|onload|onerror/i', $value)) {
+                        $fail('Las notas contienen contenido no permitido.');
+                    }
+                }
+            ]
         ]);
 
-        $this->selectedAppointment->update([
-            'technician_id' => $this->technician_id ?: null, // Si viene vacío, null
-            'status' => $this->status,
-            'notes' => $this->adminNotes
-        ]);
+        $currentStatus = $this->selectedAppointment->status;
+        $newStatus = $this->status;
 
-        $this->showModal = false;
+        // Validar transiciones permitidas
+        $allowedTransitions = [
+            'pending' => ['confirmed', 'cancelled'],
+            'confirmed' => ['in_progress', 'cancelled'],
+            'in_progress' => ['completed', 'cancelled'],
+            'completed' => [], // No se puede cambiar desde completado
+            'cancelled' => [], // No se puede cambiar desde cancelado
+        ];
 
-        $this->dispatch('close-modal');
+        if (!in_array($newStatus, $allowedTransitions[$currentStatus])) {
+            $this->dispatch('error', 'Transición de estado no permitida de ' . __($currentStatus) . ' a ' . __($newStatus) . '.');
+            return;
+        }
 
-        // Emitimos evento para refrescar calendario y notificar
-        $this->dispatch('refresh-calendar');
-        $this->dispatch('notify', 'Cita actualizada correctamente.');
+        // Solo administradores pueden cancelar citas confirmadas
+        if ($currentStatus === 'confirmed' && $newStatus === 'cancelled') {
+            if (!$user->hasPermissionTo('appointments.assign')) {
+                $this->dispatch('error', 'Solo los administradores pueden cancelar citas confirmadas.');
+                return;
+            }
+        }
+
+        // Validar que se asigne técnico antes de confirmar
+        if ($newStatus === 'confirmed' && empty($this->technician_id)) {
+            $this->dispatch('error', 'Debe asignar un técnico antes de confirmar la cita.');
+            return;
+        }
+
+        try {
+            $this->selectedAppointment->update([
+                'technician_id' => $this->technician_id ?: null, // Si viene vacío, null
+                'status' => $this->status,
+                'notes' => $this->adminNotes ? clean($this->adminNotes) : null
+            ]);
+
+            $this->showModal = false;
+            $this->dispatch('close-modal');
+            // Emitimos evento para refrescar calendario y notificar
+            $this->dispatch('refresh-calendar');
+            $this->dispatch('notify', 'Cita actualizada correctamente.');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Error al actualizar la cita: ' . $e->getMessage());
+        }
     }
 
     // Cargar datos al hacer clic en el calendario
@@ -98,38 +175,121 @@ class AppointmentCalendar extends Component
         abort_unless(auth()->user()->hasAnyPermission(['appointments.be_assigned', 'appointments.assign', 'appointments.complete']), 403);
 
         $this->selectedAppointment = Appointment::findOrFail($id);
+        
+        // Validar que la cita no esté completada o cancelada
+        if (in_array($this->selectedAppointment->status, ['completed', 'cancelled'])) {
+            $this->dispatch('error', 'No se puede modificar una cita ' . $this->selectedAppointment->status . '.');
+            return;
+        }
+
+        $user = Auth::user();
+        $appointment = $this->selectedAppointment;
+
+        // Clientes solo pueden ver, no editar en el calendario
+        if ($user->hasRole('Cliente')) {
+            $this->dispatch('error', 'No tienes permisos para editar citas desde el calendario.');
+            return;
+        }
+
+        // Técnicos solo pueden editar sus citas asignadas
+        if ($user->hasPermissionTo('appointments.be_assigned') && !$user->hasPermissionTo('appointments.assign')) {
+            if ($appointment->technician_id !== $user->id) {
+                $this->dispatch('error', 'Solo puedes editar tus propias citas asignadas.');
+                return;
+            }
+        }
+
         $this->technician_id = $this->selectedAppointment->technician_id;
         $this->status = $this->selectedAppointment->status;
         $this->adminNotes = $this->selectedAppointment->notes;
 
-        $this->showModal = true; // Abrimos modal
-
-        // Emitimos el evento de Alpine para abrir el modal. El nombre debe coincidir con el 'name' del x-modal.
+        $this->showModal = true;
         $this->dispatch('open-modal', 'admin-appointment-manager');
     }
 
     // Método para mover citas (Drag & Drop) - Solo Admin y Cliente (con reglas)
     public function updateAppointmentDate($id, $newDate)
     {
-        $cita = Appointment::findOrFail($id);
+        $appointment = Appointment::findOrFail($id);
         $user = Auth::user();
 
-        // Validaciones rápidas
-        if ($user->hasPermissionTo('appointments.edit') && $cita->user_id !== $user->id) abort(403);
-
-        if ($cita->scheduled_at->diffInHours(now()) < 24) {
-            $this->dispatch('error', 'No se puede reprogramar con menos de 24h de antelación.');
-            $this->dispatch('refresh-calendar');
-
+        if (!strtotime($newDate)) {
+            $this->dispatch('error', 'Fecha inválida.');
             return;
         }
 
-        $cita->scheduled_at = Carbon::parse($newDate);
-        $cita->save();
+        // Validaciones rápidas de permisos
+        if ($user->hasPermissionTo('appointments.edit') && $appointment->user_id !== $user->id) {
+            $this->dispatch('error', 'Solo puedes modificar tus propias citas.');
+            return;
+        }
 
-        Mail::to($cita->client->email)->send(new AppointmentNotification($cita, 'updated'));
+        // Solo admin puede mover citas de otros
+        if ($appointment->user_id !== $user->id && !$user->hasPermissionTo('appointments.assign')) {
+            $this->dispatch('error', 'No tienes permisos para mover esta cita.');
+            return;
+        }
 
-        $this->dispatch('notify', 'Cita reprogramada.');
+        // No permitir mover citas completadas o canceladas
+        if (in_array($appointment->status, ['completed', 'cancelled'])) {
+            $this->dispatch('error', 'No se puede reprogramar una cita ' . $appointment->status . '.');
+            return;
+        }
+
+        $newDateTime = Carbon::parse($newDate);
+        $now = Carbon::now();
+
+        // Validar que la nueva fecha no sea en el pasado
+        if ($newDateTime->lt($now)) {
+            $this->dispatch('error', 'No se puede programar una cita en el pasado.');
+            return;
+        }
+
+        // Validar antelación mínima (24 horas para reprogramación)
+        if ($appointment->scheduled_at->diffInHours($now) < 24) {
+            $this->dispatch('error', 'No se puede reprogramar con menos de 24h de antelación.');
+            return;
+        }
+
+        // Validar que la nueva fecha tenga al menos 1 hora de antelación
+        if ($newDateTime->diffInHours($now) < 1) {
+            $this->dispatch('error', 'La cita debe programarse con al menos 1 hora de antelación.');
+            return;
+        }
+
+        // Validar que no sea el mismo horario
+        if ($newDateTime->eq($appointment->scheduled_at)) {
+            $this->dispatch('error', 'La nueva fecha y hora son iguales a la actual.');
+            return;
+        }
+
+        // Opcional: Validar horario laboral (lunes a viernes, 8am-6pm)
+        if (!$this->isBusinessHours($newDateTime)) {
+            $this->dispatch('error', 'La cita debe programarse en horario laboral (Lunes a Viernes, 8:00 - 18:00).');
+            return;
+        }
+
+        try {
+            $appointment->scheduled_at = Carbon::parse($newDate);
+            $appointment->save();
+
+            Mail::to($appointment->client->email)->send(new AppointmentNotification($appointment, 'updated'));
+
+            $this->dispatch('notify', 'Cita reprogramada.');
+            $this->dispatch('refresh-calendar');
+        } catch (\Exception $e) {
+            $this->dispatch('error', $e->getMessage());
+            $this->dispatch('refresh-calendar'); // Recargar para revertir visualmente
+        }
+    }
+
+    private function isBusinessHours(Carbon $date)
+    {
+        // Lunes = 1, Viernes = 5
+        $isWeekday = $date->dayOfWeek >= 1 && $date->dayOfWeek <= 5;
+        $isBusinessHour = $date->hour >= 8 && $date->hour < 18;
+        
+        return $isWeekday && $isBusinessHour;
     }
 
     public function render()

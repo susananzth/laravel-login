@@ -45,7 +45,15 @@
             </div>
         @endif
 
-        <x-forms.input label="Notas adicionales (Opcional)" name="notes" wireModel="notes" />
+        <x-forms.input
+            label="Notas adicionales (Opcional)"
+            name="notes"
+            wireModel="notes"
+            placeholder="Escribe notas..."
+            type="textarea"
+            maxlength="500"
+            oninput="this.value = this.value.slice(0, 500)"
+        />
 
         <div class="pt-4">
             <x-button type="submit" class="w-full" loading>

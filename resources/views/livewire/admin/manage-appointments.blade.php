@@ -148,7 +148,15 @@
                     <option value="cancelled">Cancelada</option>
                 </x-forms.select>
 
-                <x-forms.input label="Notas" name="notes" wireModel="notes" />
+                <x-forms.input
+                    label="Notas"
+                    name="notes"
+                    wireModel="notes"
+                    placeholder="Escribe notas..."
+                    type="textarea"
+                    maxlength="500"
+                    oninput="this.value = this.value.slice(0, 500)"
+                />
             </div>
 
             <x-slot name="footer">

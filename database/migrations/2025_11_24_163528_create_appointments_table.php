@@ -25,7 +25,7 @@ return new class extends Migration
 
             // Estados: pending, confirmed, in_progress, completed, cancelled
             $table->string('status')->default('pending');
-            $table->text('notes')->nullable(); // Notas del cliente o mecánico
+            $table->text('notes', 500)->nullable(); // Notas del cliente o mecánico
             $table->timestamps();
         });
     }

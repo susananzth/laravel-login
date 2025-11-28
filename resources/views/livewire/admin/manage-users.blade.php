@@ -118,6 +118,7 @@
                         wireModel="firstname"
                         icon="fas fa-user"
                         placeholder="Ej: Juan"
+                        maxlength="150"
                         required
                     />
                     <x-forms.input
@@ -125,6 +126,7 @@
                         name="lastname"
                         wireModel="lastname"
                         placeholder="Ej: Pérez"
+                        maxlength="150"
                         required
                     />
                 </div>
@@ -136,14 +138,17 @@
                         wireModel="username"
                         icon="fas fa-at"
                         placeholder="juanperez"
+                        maxlength="50"
                         required
                     />
                     <x-forms.input
                         label="Teléfono"
                         name="phone"
+                        type="tel"
                         wireModel="phone"
                         icon="fas fa-phone"
-                        placeholder="999 999 999"
+                        placeholder="999111555"
+                        maxlength="10"
                         required
                     />
                 </div>
@@ -155,6 +160,7 @@
                     wireModel="email"
                     icon="fas fa-envelope"
                     placeholder="ejemplo@correo.com"
+                    maxlength="150"
                     required
                 />
 

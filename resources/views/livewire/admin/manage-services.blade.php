@@ -98,6 +98,7 @@
                     wireModel="name"
                     icon="fas fa-tag"
                     placeholder="Ej: Cambio de Aceite"
+                    maxlength="70"
                     required
                 />
 
@@ -110,6 +111,7 @@
                         wireModel="price"
                         icon="fas fa-money-bill"
                         placeholder="0.00"
+                        maxlength="10"
                         required
                     />
                     <x-forms.input
@@ -128,6 +130,7 @@
                     name="description"
                     wireModel="description"
                     type="textarea"
+                    maxlength="255"
                     placeholder="Detalles del servicio..."
                 />
 

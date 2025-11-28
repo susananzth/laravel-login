@@ -13,6 +13,7 @@
                     :label="__('Nombres')"
                     required
                     autofocus
+                    maxlength="150"
                     placeholder="Ej: Juan"
                 />
 
@@ -21,6 +22,7 @@
                     wireModel="lastname"
                     :label="__('Apellidos')"
                     required
+                    maxlength="150"
                     placeholder="Ej: Pérez"
                 />
             </div>
@@ -29,6 +31,7 @@
                 <x-forms.input
                     name="username"
                     wireModel="username"
+                    maxlength="50"
                     :label="__('Usuario')"
                     required
                     placeholder="juanperez"
@@ -39,7 +42,9 @@
                     wireModel="phone"
                     :label="__('Teléfono')"
                     required
-                    placeholder="999 999 999"
+                    type="tel"
+                    placeholder="999111555"
+                    maxlength="10"
                 />
             </div>
 
@@ -49,6 +54,7 @@
                 :label="__('Correo electrónico')"
                 type="email"
                 required
+                maxlength="150"
                 placeholder="tu@email.com"
             />
 

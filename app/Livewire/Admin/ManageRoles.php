@@ -20,7 +20,7 @@ class ManageRoles extends Component
     protected function rules()
     {
         $rules = [
-            'name' => 'required|min:3|unique:roles,name,' . $this->roleId,
+            'name' => 'required|min:3|max:50|unique:roles,name,' . $this->roleId,
             'selectedPermissions' => 'array'
         ];
 

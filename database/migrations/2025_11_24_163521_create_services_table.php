@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Ej: Cambio de Aceite
-            $table->text('description')->nullable();
+            $table->string('name', 70); // Ej: Cambio de Aceite
+            $table->string('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->integer('duration_minutes')->default(60); // Para calcular huecos en agenda
             $table->boolean('is_active')->default(true);

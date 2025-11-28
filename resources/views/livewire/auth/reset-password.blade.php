@@ -15,6 +15,7 @@
                 type="email"
                 required
                 readonly
+                maxlength="150"
                 class="bg-gray-50 cursor-not-allowed" {{-- Visualmente bloqueado --}}
                 icon="fas fa-envelope"
             />

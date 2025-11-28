@@ -16,6 +16,7 @@
                 type="email"
                 required
                 autofocus
+                maxlength="150"
                 autocomplete="email"
                 placeholder="tu@email.com"
             />

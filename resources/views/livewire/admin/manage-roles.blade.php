@@ -84,7 +84,7 @@
                     wireModel="name"
                     placeholder="Ej: supervisor"
                     required
-                    {{-- Si es rol de sistema, lo deshabilitamos visualmente --}}
+                    maxlength="50"
                     :disabled="$isSystemRole && $roleId"
                     class="{{ $isSystemRole && $roleId ? 'bg-gray-100 cursor-not-allowed' : '' }}"
                 />
