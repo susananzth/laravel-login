@@ -6,6 +6,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\URL;
 
 class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
 {
@@ -20,6 +23,21 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
     public function __construct($isWelcome = false)
     {
         $this->isWelcome = $isWelcome;
+    }
+
+    /**
+     * Sobrescribimos este método para asegurar control total sobre la generación de la ruta.
+     */
+    protected function verificationUrl($notifiable)
+    {
+        return URL::temporarySignedRoute(
+            'verification.verify',
+            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+            [
+                'id' => $notifiable->getKey(),
+                'hash' => sha1($notifiable->getEmailForVerification()),
+            ]
+        );
     }
 
     /**
