@@ -92,19 +92,19 @@ class AppointmentCalendar extends Component
 
         $this->validate([
             'status' => [
-                'required', 
-                'string', 
+                'required',
+                'string',
                 'in:pending,confirmed,in_progress,completed,cancelled',
                 'max:20'
             ],
             'technician_id' => [
-                'nullable', 
-                'integer', 
+                'nullable',
+                'integer',
                 'exists:users,id'
             ],
             'adminNotes' => [
-                'nullable', 
-                'string', 
+                'nullable',
+                'string',
                 'max:500',
                 function ($attribute, $value, $fail) {
                     if ($value && preg_match('/<script|javascript:|onclick|onload|onerror/i', $value)) {
@@ -168,7 +168,7 @@ class AppointmentCalendar extends Component
         abort_unless(auth()->user()->hasAnyPermission(['appointments.be_assigned', 'appointments.assign', 'appointments.complete']), 403);
 
         $this->selectedAppointment = Appointment::findOrFail($id);
-        
+
         // Validar que la cita no esté completada o cancelada
         if (in_array($this->selectedAppointment->status, ['completed', 'cancelled'])) {
             $this->dispatch('app-error', 'No se puede modificar una cita ' . __($this->selectedAppointment->status) . '.');
@@ -287,12 +287,12 @@ class AppointmentCalendar extends Component
 
         // Eliminar etiquetas HTML peligrosas
         $cleaned = strip_tags($notes);
-        
+
         // Limitar longitud
         if (strlen($cleaned) > 500) {
             $cleaned = substr($cleaned, 0, 500);
         }
-        
+
         return $cleaned;
     }
 
@@ -301,7 +301,7 @@ class AppointmentCalendar extends Component
         // Lunes = 1, Viernes = 5
         $isWeekday = $date->dayOfWeek >= 1 && $date->dayOfWeek <= 5;
         $isBusinessHour = $date->hour >= 8 && $date->hour < 18;
-        
+
         return $isWeekday && $isBusinessHour;
     }
 

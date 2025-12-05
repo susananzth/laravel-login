@@ -88,7 +88,6 @@ class DatabaseSeeder extends Seeder
         $roleClient->givePermissionTo([
             'appointments.view_own',
             'appointments.create',
-            'appointments.edit',
             'appointments.cancel'
         ]);
     }
@@ -222,21 +221,21 @@ class DatabaseSeeder extends Seeder
 
             for ($i = 0; $i < $dailyAppointments; $i++) {
                 $service = $services->random();
-                
+
                 // Horario aleatorio laboral (09:00 a 17:00)
                 $hour = rand(9, 17);
                 $minute = [0, 15, 30, 45][rand(0, 3)];
-                
+
                 $scheduledAt = $currentDate->copy()->setTime($hour, $minute);
-                
+
                 // Determinar estado basado en si la fecha ya pasó
                 $isPast = $scheduledAt->lt(Carbon::now());
-                
+
                 if ($isPast) {
                     // 80% completadas, 20% canceladas en el pasado
                     $status = (rand(1, 10) > 2) ? 'completed' : 'cancelled';
-                    $finishedAt = ($status === 'completed') 
-                        ? $scheduledAt->copy()->addMinutes($service->duration_minutes) 
+                    $finishedAt = ($status === 'completed')
+                        ? $scheduledAt->copy()->addMinutes($service->duration_minutes)
                         : null;
                 } else {
                     // Futuro: pending o confirmed
