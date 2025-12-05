@@ -16,6 +16,7 @@
         @fluxScripts
 
         <x-toast-notification />
+        <x-dev-disclaimer />
         @livewireScripts
 
         <style>

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+Route::view('/project-specs', 'project-specs')->name('project.specs');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', function () {
