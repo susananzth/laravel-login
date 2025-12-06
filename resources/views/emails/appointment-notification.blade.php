@@ -12,7 +12,7 @@
         .details { background-color: #f9fafb; padding: 20px; border-radius: 6px; border-left: 4px solid #DC2626; margin: 20px 0; }
         .details p { margin: 5px 0; font-size: 15px; }
         .footer { background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; }
-        .btn { display: inline-block; background-color: #DC2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+        .btn { display: inline-block; background-color: #DC2626; color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>

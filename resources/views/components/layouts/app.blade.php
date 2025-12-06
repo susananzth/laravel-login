@@ -26,6 +26,15 @@
             </div>
         </div>
 
+        <style>
+            .fc-header-toolbar .fc-toolbar .fc-toolbar-ltr {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0 0.5rem;
+            }
+        </style>
+
         <x-toast-notification />
         @livewireScripts
     </body>
